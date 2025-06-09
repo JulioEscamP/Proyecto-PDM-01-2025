@@ -31,4 +31,8 @@ data class ErrorResponse(
     val code: Int?
 )
 
+data class GoogleSignInRequest(
+    val idToken: String
+)
+
 //FIN de las data clases para login
