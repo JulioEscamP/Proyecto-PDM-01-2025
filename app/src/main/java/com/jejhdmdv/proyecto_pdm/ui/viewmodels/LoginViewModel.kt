@@ -8,18 +8,20 @@ import com.jejhdmdv.proyecto_pdm.data.LoginRequest
 import com.jejhdmdv.proyecto_pdm.data.LoginResponse
 import com.jejhdmdv.proyecto_pdm.data.repository.AuthRepository
 import com.jejhdmdv.proyecto_pdm.utils.Resource
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
 class LoginViewModel(private val authRepository: AuthRepository) : ViewModel() {
 
-    private val _loginResult = MutableLiveData<Resource<LoginResponse>>()
-    val loginResult: LiveData<Resource<LoginResponse>> = _loginResult
+    private val _loginResult = MutableStateFlow<Resource<LoginResponse>>(Resource.Loading())
+    val loginResult: StateFlow<Resource<LoginResponse>> = _loginResult.asStateFlow()
 
     fun performLogin(email: String, password: String) {
         _loginResult.value = Resource.Loading()
         viewModelScope.launch {
-            val request = LoginRequest(email, password)
-            _loginResult.value = authRepository.login(request)
+            _loginResult.value = authRepository.login(LoginRequest(email, password))
         }
     }
 
