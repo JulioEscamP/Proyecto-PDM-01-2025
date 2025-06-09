@@ -57,6 +57,8 @@ dependencies {
     implementation(libs.kotlinx.coroutines.android)
     implementation(libs.play.services.auth)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

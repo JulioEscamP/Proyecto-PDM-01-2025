@@ -24,14 +24,18 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInClient
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
@@ -119,17 +123,15 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
-    //
-    val loginResult by viewModel.loginResult.collectAsStateWithLifecycle() // Usa collectAsStateWithLifecycle para LiveData/StateFlow
 
-    // Efecto secundario para reaccionar a los cambios en loginResult
+    val loginResult by viewModel.loginResult.collectAsStateWithLifecycle()
+
     LaunchedEffect(loginResult) {
         when (loginResult) {
+
+            //TODO: Revisar clase resource -- ERROR AQUI
             is Resource.Success -> {
                 Toast.makeText(context, "Login exitoso!", Toast.LENGTH_SHORT).show()
-                // Aquí podrías navegar a la siguiente pantalla
-                // val accessToken = (loginResult as Resource.Success).data?.accessToken
-                // Guardar token y navegar
             }
             is Resource.Error -> {
                 Toast.makeText(context, "Error: ${loginResult.message}", Toast.LENGTH_LONG).show()
@@ -174,7 +176,7 @@ fun LoginScreen(
 
         Button(
             onClick = { viewModel.performLogin(email, password) },
-            enabled = loginResult !is Resource.Loading, // Deshabilita el botón mientras carga
+            enabled = loginResult !is Resource.Loading,
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Iniciar Sesión")
@@ -186,7 +188,7 @@ fun LoginScreen(
             onClick = onGoogleSignInClick,
             enabled = loginResult !is Resource.Loading,
             modifier = Modifier.fillMaxWidth(),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer) // Ejemplo de color
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primaryContainer)
         ) {
             Text("Iniciar Sesión con Google")
         }
