@@ -116,9 +116,7 @@ class LoginActivity : ComponentActivity() {
 @Composable
 fun LoginScreen(
     onGoogleSignInClick: () -> Unit,
-    viewModel: LoginViewModel = viewModel(
-        factory = LoginViewModelFactory(AuthRepository(RetrofitClient.authApiService))
-    )
+    viewModel: LoginViewModel
 ) {
     val context = LocalContext.current // Para mostrar Toasts
 
@@ -207,6 +205,6 @@ fun LoginScreen(
 @Composable
 fun PreviewLoginScreen() {
     ProyectoPDMTheme {
-        LoginScreen(onGoogleSignInClick = {})
+
     }
 }
