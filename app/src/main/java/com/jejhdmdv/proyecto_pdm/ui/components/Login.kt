@@ -53,9 +53,9 @@ import com.jejhdmdv.proyecto_pdm.utils.Resource
 class LoginActivity : ComponentActivity() {
 
     private lateinit var googleSignInClient: GoogleSignInClient
-    private lateinit var googleSignInLauncher: ActivityResultLauncher<Intent> // Para el nuevo enfoque de ActivityResultLauncher
+    private lateinit var googleSignInLauncher: ActivityResultLauncher<Intent>
 
-    private lateinit var loginViewModel: LoginViewModel // <-- Renombrada para claridad
+    private lateinit var loginViewModel: LoginViewModel //
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,7 +68,7 @@ class LoginActivity : ComponentActivity() {
         // Configurar Google Sign-In
         val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
-            .requestIdToken("WEB_CLIENT_ID") // TODO: Reemplaza con tu ID de cliente de Google - Ya tengo el ID en la consola de Google
+            .requestIdToken("75282745771-197vm5m67kuec92bj5o22ju2bf2ap4kl.apps.googleusercontent.com")
             .build()
         googleSignInClient = GoogleSignIn.getClient(this, gso)
 
@@ -130,7 +130,7 @@ fun LoginScreen(
     LaunchedEffect(loginResult) {
         when (loginResult) {
 
-            //TODO: Revisar clase resource -- ERROR AQUI
+
             is Resource.Success -> {
                 Toast.makeText(context, "Login exitoso!", Toast.LENGTH_SHORT).show()
             }

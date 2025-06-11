@@ -39,6 +39,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+
+
         val repository = AuthRepository(RetrofitClient.authApiService)
         val viewModelFactory = LoginViewModelFactory(repository)
         loginViewModel = ViewModelProvider(this, viewModelFactory).get(LoginViewModel::class.java)
@@ -48,6 +50,8 @@ class MainActivity : ComponentActivity() {
             .requestIdToken("75282745771-197vm5m67kuec92bj5o22ju2bf2ap4kl.apps.googleusercontent.com")
             .build()
         googleSignInClient = GoogleSignIn.getClient(this, gso)
+
+
 
         googleSignInLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
             if (result.resultCode == RESULT_OK) {
@@ -69,19 +73,22 @@ class MainActivity : ComponentActivity() {
             }
         }
 
+
+
+
+
         setContent {
             ProyectoPDMTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    // Call your LoginScreen here
                     LoginScreen(
                         onGoogleSignInClick = {
                             val signInIntent = googleSignInClient.signInIntent
                             googleSignInLauncher.launch(signInIntent)
                         },
-                        viewModel = loginViewModel // Pass the ViewModel instance to the Composable
+                        viewModel = loginViewModel
                     )
                 }
             }
