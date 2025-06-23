@@ -7,7 +7,7 @@ import okhttp3.logging.HttpLoggingInterceptor
 
 object RetrofitClient {
 
-    private const val BASE_URL = "" //URL de backend
+    private const val BASE_URL = "http://10.0.2.2:5000/api/" //URL de backend
 
     private val loggingInterceptor = HttpLoggingInterceptor().apply {
         level = HttpLoggingInterceptor.Level.BODY // Ver logs de las peticiones/respuestas

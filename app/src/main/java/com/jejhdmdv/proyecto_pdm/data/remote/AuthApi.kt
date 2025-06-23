@@ -14,12 +14,10 @@ interface AuthApiService {
     @POST("auth/login") // TODO: La ruta en el backend para autentificar el login
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
 
-    // TODO: endpoint para registro (Ruta en el backend)
-
     @POST("auth/register")
     suspend fun register(@Body request: RegisterRequest): Response<RegisterResponse>
 
-    // En AuthApiService.kt
+    @POST("auth/google-login") //Google Login Endpoint
     suspend fun googleLogin(@Body request: GoogleSignInRequest): Response<LoginResponse>
 
 }

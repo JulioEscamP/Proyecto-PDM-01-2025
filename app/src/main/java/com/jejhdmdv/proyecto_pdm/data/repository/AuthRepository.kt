@@ -5,6 +5,8 @@ import com.jejhdmdv.proyecto_pdm.data.LoginResponse
 import com.jejhdmdv.proyecto_pdm.data.remote.AuthApiService
 import com.jejhdmdv.proyecto_pdm.utils.Resource
 import com.jejhdmdv.proyecto_pdm.data.GoogleSignInRequest
+import com.jejhdmdv.proyecto_pdm.data.RegisterRequest
+import com.jejhdmdv.proyecto_pdm.data.RegisterResponse
 
 
 class AuthRepository(private val authApiService: AuthApiService) {
@@ -49,6 +51,25 @@ class AuthRepository(private val authApiService: AuthApiService) {
         } catch (e: Exception) {
 
             Resource.Error<LoginResponse>("Error de red al intentar Google Login: ${e.localizedMessage}")
+        }
+    }
+
+    suspend fun register(request: RegisterRequest): Resource<RegisterResponse> {
+        return try {
+            val response = authApiService.register(request)
+            if (response.isSuccessful) {
+                val body = response.body()
+                if (body != null) {
+                    Resource.Success(body)
+                } else {
+                    Resource.Error<RegisterResponse>("Respuesta de registro vacía")
+                }
+            } else {
+                val errorBody = response.errorBody()?.string()
+                Resource.Error<RegisterResponse>("Error de registro: ${response.code()} - ${errorBody ?: response.message()}")
+            }
+        } catch (e: Exception) {
+            Resource.Error<RegisterResponse>("Error de red al intentar registrar: ${e.localizedMessage}")
         }
     }
 }
