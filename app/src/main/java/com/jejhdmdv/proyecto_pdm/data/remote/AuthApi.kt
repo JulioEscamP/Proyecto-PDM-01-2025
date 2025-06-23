@@ -1,10 +1,10 @@
 package com.jejhdmdv.proyecto_pdm.data.remote
 
-import com.jejhdmdv.proyecto_pdm.data.GoogleSignInRequest
-import com.jejhdmdv.proyecto_pdm.data.LoginRequest
-import com.jejhdmdv.proyecto_pdm.data.LoginResponse
-import com.jejhdmdv.proyecto_pdm.data.RegisterRequest
-import com.jejhdmdv.proyecto_pdm.data.RegisterResponse
+import com.jejhdmdv.proyecto_pdm.model.login.GoogleSignInRequest
+import com.jejhdmdv.proyecto_pdm.model.login.LoginRequest
+import com.jejhdmdv.proyecto_pdm.model.login.LoginResponse
+import com.jejhdmdv.proyecto_pdm.model.login.RegisterRequest
+import com.jejhdmdv.proyecto_pdm.model.login.RegisterResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST

@@ -1,12 +1,14 @@
 package com.jejhdmdv.proyecto_pdm.data.repository
 
-import com.jejhdmdv.proyecto_pdm.data.LoginRequest
-import com.jejhdmdv.proyecto_pdm.data.LoginResponse
+
 import com.jejhdmdv.proyecto_pdm.data.remote.AuthApiService
+import com.jejhdmdv.proyecto_pdm.model.login.GoogleSignInRequest
+import com.jejhdmdv.proyecto_pdm.model.login.LoginRequest
+import com.jejhdmdv.proyecto_pdm.model.login.LoginResponse
+import com.jejhdmdv.proyecto_pdm.model.login.RegisterRequest
+import com.jejhdmdv.proyecto_pdm.model.login.RegisterResponse
 import com.jejhdmdv.proyecto_pdm.utils.Resource
-import com.jejhdmdv.proyecto_pdm.data.GoogleSignInRequest
-import com.jejhdmdv.proyecto_pdm.data.RegisterRequest
-import com.jejhdmdv.proyecto_pdm.data.RegisterResponse
+
 
 
 class AuthRepository(private val authApiService: AuthApiService) {

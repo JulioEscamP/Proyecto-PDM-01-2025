@@ -4,9 +4,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jejhdmdv.proyecto_pdm.data.LoginRequest
-import com.jejhdmdv.proyecto_pdm.data.LoginResponse
 import com.jejhdmdv.proyecto_pdm.data.repository.AuthRepository
+import com.jejhdmdv.proyecto_pdm.model.login.LoginRequest
+import com.jejhdmdv.proyecto_pdm.model.login.LoginResponse
 import com.jejhdmdv.proyecto_pdm.utils.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
