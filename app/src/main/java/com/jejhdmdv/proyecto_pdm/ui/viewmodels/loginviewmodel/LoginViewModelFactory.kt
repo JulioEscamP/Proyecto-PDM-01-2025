@@ -1,4 +1,4 @@
-package com.jejhdmdv.proyecto_pdm.ui.viewmodels
+package com.jejhdmdv.proyecto_pdm.ui.viewmodels.loginviewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

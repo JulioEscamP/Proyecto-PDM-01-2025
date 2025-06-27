@@ -26,8 +26,8 @@ import com.jejhdmdv.proyecto_pdm.data.remote.RetrofitClient
 import com.jejhdmdv.proyecto_pdm.data.repository.AuthRepository
 import com.jejhdmdv.proyecto_pdm.ui.components.LoginScreen
 import com.jejhdmdv.proyecto_pdm.ui.theme.ProyectoPDMTheme
-import com.jejhdmdv.proyecto_pdm.ui.viewmodels.LoginViewModel
-import com.jejhdmdv.proyecto_pdm.ui.viewmodels.LoginViewModelFactory
+import com.jejhdmdv.proyecto_pdm.ui.viewmodels.loginviewmodel.LoginViewModel
+import com.jejhdmdv.proyecto_pdm.ui.viewmodels.loginviewmodel.LoginViewModelFactory
 
 class MainActivity : ComponentActivity() {
 
