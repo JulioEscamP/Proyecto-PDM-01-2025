@@ -73,10 +73,6 @@ class MainActivity : ComponentActivity() {
             }
         }
 
-
-
-
-
         setContent {
             ProyectoPDMTheme {
                 Surface(
