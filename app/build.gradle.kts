@@ -28,7 +28,6 @@ android {
         }
     }
     compileOptions {
-
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
         isCoreLibraryDesugaringEnabled = true
@@ -39,11 +38,20 @@ android {
     buildFeatures {
         compose = true
     }
+
+    packaging {
+        resources {
+            // Regla nueva para patch de error de gradle que tenia
+            excludes += "/META-INF/INDEX.LIST"
+            excludes += "/META-INF/{ALFNS,LGPL2.1,LICENSE,NOTICE,LICENSE.txt,NOTICE.txt,DEPENDENCIES}"
+        }
+    }
 }
 
+// Bloque de dependencias CORREGIDO
 dependencies {
 
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
+    coreLibraryDesugaring(libs.desugar.jdk.libs) // Correcto, se queda
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
@@ -62,12 +70,12 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.lifecycle.livedata.ktx)
-    implementation(libs.google.oauth.client.jetty)
-    implementation(libs.google.oauth.client.appengine)
+    // implementation(libs.google.oauth.client.jetty) //
+    // implementation(libs.google.oauth.client.appengine) //
     implementation(libs.google.auth.library.oauth2.http)
     implementation(libs.google.api.client.android)
     implementation(libs.google.api.services.calendar)
-    implementation(libs.desugar.jdk.libs)
+    // implementation(libs.desugar.jdk.libs) //
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
