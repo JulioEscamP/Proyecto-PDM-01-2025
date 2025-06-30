@@ -53,7 +53,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jejhdmdv.proyecto_pdm.R
-import com.jejhdmdv.proyecto_pdm.ui.viewmodels.LoginViewModel
+import com.jejhdmdv.proyecto_pdm.ui.viewmodels.loginviewmodel.LoginViewModel
 import com.jejhdmdv.proyecto_pdm.utils.Resource
 import androidx.compose.ui.draw.rotate
 

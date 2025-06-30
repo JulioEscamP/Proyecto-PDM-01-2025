@@ -33,7 +33,7 @@ import com.jejhdmdv.proyecto_pdm.ui.screens.StoreScreen
 import com.jejhdmdv.proyecto_pdm.ui.screens.ProductDetailScreen
 import com.jejhdmdv.proyecto_pdm.ui.screens.CartScreen
 import com.jejhdmdv.proyecto_pdm.ui.screens.PaymentScreen
-import com.jejhdmdv.proyecto_pdm.ui.viewmodels.LoginViewModel
+import com.jejhdmdv.proyecto_pdm.ui.viewmodels.loginviewmodel.LoginViewModel
 
 /**
  * Composable que define el grafo de navegación de la aplicación

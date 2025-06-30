@@ -48,10 +48,6 @@ import java.time.YearMonth
 import java.time.format.TextStyle
 import java.util.Locale
 
-/*
- Pantalla de calendario para agendar citas
-  Permite seleccionar fecha y hora para una cita
- */
 @Composable
 fun CalendarScreen(
     onNavigateBack: () -> Unit = {},

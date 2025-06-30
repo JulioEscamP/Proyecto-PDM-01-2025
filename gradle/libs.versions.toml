@@ -24,6 +24,11 @@ googleAuthLibraryOauth2Http = "1.35.0"
 googleApiClientAndroid = "2.8.0"
 googleApiServicesCalendar = "v3-rev20250404-2.0.0"
 desugar_jdk_libs = "2.1.5"
+navigationCommon = "2.9.0"
+navigationRuntime = "2.9.0"
+navigationRuntimeKtx = "2.9.0"
+navigationCompose = "2.9.0"
+materialIconsExtended = "1.7.8"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -56,6 +61,11 @@ google-auth-library-oauth2-http = { group = "com.google.auth", name = "google-au
 google-api-client-android = { group = "com.google.api-client", name = "google-api-client-android", version.ref = "googleApiClientAndroid" }
 google-api-services-calendar = { group = "com.google.apis", name = "google-api-services-calendar", version.ref = "googleApiServicesCalendar" }
 desugar_jdk_libs = { group = "com.android.tools", name = "desugar_jdk_libs", version.ref = "desugar_jdk_libs" }
+androidx-navigation-common = { group = "androidx.navigation", name = "navigation-common", version.ref = "navigationCommon" }
+androidx-navigation-runtime = { group = "androidx.navigation", name = "navigation-runtime", version.ref = "navigationRuntime" }
+androidx-navigation-runtime-ktx = { group = "androidx.navigation", name = "navigation-runtime-ktx", version.ref = "navigationRuntimeKtx" }
+androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+androidx-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "materialIconsExtended" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

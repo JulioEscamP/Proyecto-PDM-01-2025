@@ -51,6 +51,11 @@ android {
 // Bloque de dependencias CORREGIDO
 dependencies {
 
+    implementation(libs.androidx.navigation.common)
+    implementation(libs.androidx.navigation.runtime)
+    implementation(libs.androidx.navigation.runtime.ktx)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.material.icons.extended)
     coreLibraryDesugaring(libs.desugar.jdk.libs) // Correcto, se queda
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
