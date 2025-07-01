@@ -1,5 +1,9 @@
 package com.jejhdmdv.proyecto_pdm.navigation
 
+import android.app.Activity
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -8,15 +12,22 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
 import com.jejhdmdv.proyecto_pdm.ui.screens.EmergencyScreen
 import com.jejhdmdv.proyecto_pdm.ui.screens.HomeScreen
 import com.jejhdmdv.proyecto_pdm.ui.screens.LoginScreen
@@ -34,6 +45,7 @@ import com.jejhdmdv.proyecto_pdm.ui.screens.ProductDetailScreen
 import com.jejhdmdv.proyecto_pdm.ui.screens.CartScreen
 import com.jejhdmdv.proyecto_pdm.ui.screens.PaymentScreen
 import com.jejhdmdv.proyecto_pdm.ui.viewmodels.loginviewmodel.LoginViewModel
+import com.jejhdmdv.proyecto_pdm.utils.Resource
 
 /**
  * Composable que define el grafo de navegación de la aplicación
@@ -49,13 +61,63 @@ fun NavGraph(
         navController = navController,
         startDestination = Screen.Login.route
     ) {
-        // Pantalla de inicio de sesión
+        // --- PANTALLA DE LOGIN ---
         composable(Screen.Login.route) {
+
+            val loginViewModel: LoginViewModel = loginViewModel
+            // El contexto para google sign-In
+            val context = LocalContext.current
+
+            // Logica del launcher para recibir el resultado de Google
+            val launcher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.StartActivityForResult()
+            ) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+                    try {
+                        val account = task.getResult(ApiException::class.java)!!
+                        val idToken = account.idToken
+                        if (idToken != null) {
+                            loginViewModel.signInWithGoogle(idToken)
+                        } else {
+                            // Manejar el caso de token nulo
+                            Toast.makeText(context, "Error: idToken de Google es nulo.", Toast.LENGTH_SHORT).show()
+                        }
+                    } catch (e: ApiException) {
+                        // Manejar error de la API
+                        Toast.makeText(context, "Error de Google Sign-In: ${e.statusCode}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
+            // Logic de navegacion para cuando el login sea exitoso
+            val loginResult by loginViewModel.loginResult.collectAsStateWithLifecycle()
+            LaunchedEffect(loginResult) {
+                if (loginResult is Resource.Success) {
+                    // Navega a la pantalla principal y limpia la pila de navegación
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Login.route) { inclusive = true }
+                    }
+                }
+            }
+
+            // LoginScreen con toda la logica conectada
             LoginScreen(
-                onGoogleSignInClick = onGoogleSignInClick,
                 viewModel = loginViewModel,
                 onNavigateToRegister = {
                     navController.navigate(Screen.Register.route)
+                },
+                onGoogleSignInClick = {
+                    // Preparamos y lanzamos el intent de Google al hacer clic
+                    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestEmail()
+                        .requestIdToken("75282745771-197vm5m67kuec92bj5o22ju2bf2ap4kl.apps.googleusercontent.com")
+                        .build()
+                    val googleSignInClient = GoogleSignIn.getClient(context, gso)
+
+                    googleSignInClient.signOut().addOnCompleteListener {
+                        launcher.launch(googleSignInClient.signInIntent)
+                    }
                 }
             )
         }

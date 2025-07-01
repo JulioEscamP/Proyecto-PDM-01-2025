@@ -215,7 +215,7 @@ fun LoginScreen(
 
             // Botón de Google
             Button(
-                onClick = onGoogleSignInClick,
+                onClick = onGoogleSignInClick, //La funciona la pondre en NavHost
                 enabled = loginResult !is Resource.Loading,
                 modifier = Modifier
                     .width(260.dp)
