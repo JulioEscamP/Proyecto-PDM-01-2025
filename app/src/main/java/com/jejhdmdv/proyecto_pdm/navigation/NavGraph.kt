@@ -125,8 +125,16 @@ fun NavGraph(
         // Pantalla de registro
         composable(Screen.Register.route) {
             RegisterScreen(
-                onNavigateToLogin = {
-                    navController.popBackStack()
+                viewModel = loginViewModel, // Actualice y ahora ocupa el viewmodel que tengo para registro
+                onNavigateToLogin = { navController.popBackStack() },
+                onRegisterSuccess = {
+                    navController.navigate(Screen.Home.route) {
+                        // Elimina las pantallas de Login y Registro del historial.
+                        // usuario no podrá volver a ellas con el botón "atrás".
+                        popUpTo(Screen.Login.route) {
+                            inclusive = true
+                        }
+                    }
                 }
             )
         }

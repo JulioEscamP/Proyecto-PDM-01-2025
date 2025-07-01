@@ -18,11 +18,13 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -37,22 +39,46 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.jejhdmdv.proyecto_pdm.R
+import com.jejhdmdv.proyecto_pdm.model.login.RegisterRequest
+import com.jejhdmdv.proyecto_pdm.ui.viewmodels.loginviewmodel.LoginViewModel
+import com.jejhdmdv.proyecto_pdm.utils.Resource
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
-    onNavigateToLogin: () -> Unit
+    viewModel: LoginViewModel, // Recibimos el ViewModel
+    onNavigateToLogin: () -> Unit,
+    onRegisterSuccess: () -> Unit
 ) {
     val context = LocalContext.current
 
-    // Estados para los campos del formulario
+    // Estados para todos los campos del formulario
     var nombre by remember { mutableStateOf("") }
     var edad by remember { mutableStateOf("") }
     var dui by remember { mutableStateOf("") }
     var correoElectronico by remember { mutableStateOf("") }
     var telefono by remember { mutableStateOf("") }
     var direccion by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+
+    val registerResult by viewModel.registerResult.collectAsStateWithLifecycle()
+
+    // Efecto para mostrar Toasts y navegar al tener éxito
+    LaunchedEffect(registerResult) {
+        when (val result = registerResult) {
+            is Resource.Success -> {
+                Toast.makeText(context, result.data?.message, Toast.LENGTH_LONG).show()
+                onRegisterSuccess() // Navegamos a la siguiente pantalla (ej. Login)
+            }
+            is Resource.Error -> {
+                Toast.makeText(context, "Error: ${result.message}", Toast.LENGTH_LONG).show()
+            }
+            else -> { /* No hacer nada en Idle o Loading */ }
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -186,6 +212,32 @@ fun RegisterScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // Campo Contraseña
+
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                label = { Text("Contraseña") },
+                placeholder = { Text("Ingrese contraseña") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth(),
+                colors = textFieldColors,
+                shape = RoundedCornerShape(8.dp)
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            OutlinedTextField(
+                value = confirmPassword,
+                onValueChange = { confirmPassword = it },
+                label = { Text("Confirmar Contraseña") },
+                placeholder = { Text("******") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                modifier = Modifier.fillMaxWidth(),
+                colors = textFieldColors,
+                shape = RoundedCornerShape(8.dp)
+            )
+
             // Campo Teléfono
             OutlinedTextField(
                 value = telefono,
@@ -216,10 +268,29 @@ fun RegisterScreen(
             // Botón de crear cuenta
             Button(
                 onClick = {
-                    // logica para el registro
-                    Toast.makeText(context, "Crear Cuenta (Funcionalidad pendiente)", Toast.LENGTH_SHORT).show()
+                    if (nombre.isBlank() || correoElectronico.isBlank() || password.isBlank()) {
+                        Toast.makeText(context, "Nombre, correo y contraseña son obligatorios.", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
+                    if (password != confirmPassword) {
+                        Toast.makeText(context, "Las contraseñas no coinciden.", Toast.LENGTH_SHORT).show()
+                        return@Button
+                    }
 
-                },
+                    val request = RegisterRequest(
+                        nombre = nombre,
+                        edad = edad,
+                        dui = dui,
+                        email = correoElectronico,
+                        telefono = telefono,
+                        direccion = direccion,
+                        password = password,
+                        passwordConfirmation = confirmPassword
+                    )
+                    viewModel.performRegister(request)
+                }, enabled = registerResult !is Resource.Loading,
+
+                //Diseño del boton
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(50.dp),
@@ -229,7 +300,11 @@ fun RegisterScreen(
                 ),
                 shape = RoundedCornerShape(8.dp)
             ) {
-                Text("Crear Cuenta", fontSize = 16.sp)
+                if (registerResult is Resource.Loading) {
+                    CircularProgressIndicator()
+                } else {
+                    Text("Crear Cuenta")
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
