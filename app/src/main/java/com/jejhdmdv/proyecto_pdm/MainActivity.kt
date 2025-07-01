@@ -19,10 +19,13 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import androidx.compose.ui.platform.LocalContext
 import com.google.android.gms.common.api.ApiException
+import com.jejhdmdv.proyecto_pdm.data.remote.RetrofitClient
+import com.jejhdmdv.proyecto_pdm.data.repository.AuthRepository
 import com.jejhdmdv.proyecto_pdm.navigation.NavGraph
 import com.jejhdmdv.proyecto_pdm.ui.screens.MainCalendario
 import com.jejhdmdv.proyecto_pdm.ui.theme.ProyectoPDMTheme
 import com.jejhdmdv.proyecto_pdm.ui.viewmodels.calendarioviewmodel.ReminderViewModel
+import com.jejhdmdv.proyecto_pdm.ui.viewmodels.loginviewmodel.LoginViewModelFactory
 
 
 class MainActivity : ComponentActivity() {
@@ -33,7 +36,17 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val context = LocalContext.current
 
-                val loginViewModel: LoginViewModel = viewModel()
+                val authApiService = remember {
+                    RetrofitClient.authApiService
+                }
+
+                val authRepository = remember {
+                    AuthRepository(authApiService)
+                }
+
+                val loginViewModelFactory = LoginViewModelFactory(authRepository)
+
+                val loginViewModel: LoginViewModel = viewModel(factory = loginViewModelFactory)
 
                 val googleSignInClient = remember {
                     GoogleSignIn.getClient(
@@ -50,22 +63,25 @@ class MainActivity : ComponentActivity() {
                     val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
                     try {
                         val account = task.getResult(ApiException::class.java)
-
+                        // estos son handler de errores, need to beef up el viewmodel
                     } catch (e: ApiException) {
 
                     }
                 }
 
+
+
+
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    // 3. Pasa la instancia que acabas de crear
                     NavGraph(
                         navController = navController,
                         loginViewModel = loginViewModel,
                         onGoogleSignInClick = {
                             val signInIntent = googleSignInClient.signInIntent
+
                             googleSignInLauncher.launch(signInIntent)
                         }
                     )
