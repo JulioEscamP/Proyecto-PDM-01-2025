@@ -18,7 +18,7 @@ class VetRegisterViewModel(private val authRepository: AuthRepository) : ViewMod
     fun registerVet(request: VetRegisterRequest) {
         viewModelScope.launch {
             _registerResult.value = Resource.Loading()
-            val result = authRepository.registervet(request)
+            val result = authRepository.vetRegister(request)
             _registerResult.value = result
         }
     }

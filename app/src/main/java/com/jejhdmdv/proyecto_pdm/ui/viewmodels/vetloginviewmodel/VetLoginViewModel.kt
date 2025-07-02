@@ -12,7 +12,7 @@ class VetLoginViewModel : ViewModel() {
     private val _loginResult = MutableStateFlow<Resource<Boolean>>(Resource.Loading())
     val loginResult: StateFlow<Resource<Boolean>> = _loginResult
 
-    // Aquí simulas la validación del login
+
     fun login(email: String, password: String) {
         viewModelScope.launch {
             if (email == "vet@example.com" && password == "1234") {

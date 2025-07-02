@@ -21,4 +21,8 @@ interface AuthApiService {
     @POST("auth/google-login") //Google Login Endpoint
     suspend fun googleLogin(@Body request: GoogleSignInRequest): Response<LoginResponse>
 
+    @POST("veterinarios/register")
+    suspend fun vetRegister(@Body request: VetRegisterRequest): Response<RegisterResponse>
+
+
 }
