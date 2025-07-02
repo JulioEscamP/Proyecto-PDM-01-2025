@@ -22,7 +22,6 @@ import com.google.android.gms.common.api.ApiException
 import com.jejhdmdv.proyecto_pdm.data.remote.RetrofitClient
 import com.jejhdmdv.proyecto_pdm.data.repository.AuthRepository
 import com.jejhdmdv.proyecto_pdm.navigation.NavGraph
-import com.jejhdmdv.proyecto_pdm.ui.screens.MainCalendario
 import com.jejhdmdv.proyecto_pdm.ui.theme.ProyectoPDMTheme
 import com.jejhdmdv.proyecto_pdm.ui.viewmodels.calendarioviewmodel.ReminderViewModel
 import com.jejhdmdv.proyecto_pdm.ui.viewmodels.loginviewmodel.LoginViewModelFactory

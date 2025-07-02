@@ -1,5 +1,6 @@
 package com.jejhdmdv.proyecto_pdm.ui.screens
 
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -38,11 +39,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.google.android.gms.auth.api.signin.GoogleSignIn
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.TextStyle
@@ -51,10 +56,12 @@ import java.util.Locale
 @Composable
 fun CalendarScreen(
     onNavigateBack: () -> Unit = {},
+
     onConfirmAppointment: (LocalDate, String) -> Unit = { _, _ -> },
     modifier: Modifier = Modifier,
     // Lista de fechas no disponibles, para ser proporcionada dinámicamente
     unavailableDates: List<LocalDate> = emptyList()
+
 ) {
     // Estados para el calendario y selección
     var currentMonth by remember { mutableStateOf(YearMonth.now()) }
