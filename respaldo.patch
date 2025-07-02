@@ -1,0 +1,283 @@
+diff --git a/.idea/deploymentTargetSelector.xml b/.idea/deploymentTargetSelector.xml
+index b268ef3..897f2f9 100644
+--- a/.idea/deploymentTargetSelector.xml
++++ b/.idea/deploymentTargetSelector.xml
+@@ -2,7 +2,7 @@
+ <project version="4">
+   <component name="deploymentTargetSelector">
+     <selectionStates>
+-      <SelectionState runConfigName="app">
++      <SelectionState runConfigName="Proyecto-PDM.app">
+         <option name="selectionMode" value="DROPDOWN" />
+       </SelectionState>
+     </selectionStates>
+diff --git a/app/src/main/java/com/jejhdmdv/proyecto_pdm/MainActivity.kt b/app/src/main/java/com/jejhdmdv/proyecto_pdm/MainActivity.kt
+index 84e381c..4d4ca2c 100644
+--- a/app/src/main/java/com/jejhdmdv/proyecto_pdm/MainActivity.kt
++++ b/app/src/main/java/com/jejhdmdv/proyecto_pdm/MainActivity.kt
+@@ -21,12 +21,12 @@ import androidx.compose.ui.platform.LocalContext
+ import com.google.android.gms.common.api.ApiException
+ import com.jejhdmdv.proyecto_pdm.data.remote.RetrofitClient
+ import com.jejhdmdv.proyecto_pdm.data.repository.AuthRepository
+-import com.jejhdmdv.proyecto_pdm.navigation.NavGraph
+-import com.jejhdmdv.proyecto_pdm.ui.screens.MainCalendario
+ import com.jejhdmdv.proyecto_pdm.ui.theme.ProyectoPDMTheme
+-import com.jejhdmdv.proyecto_pdm.ui.viewmodels.calendarioviewmodel.ReminderViewModel
+ import com.jejhdmdv.proyecto_pdm.ui.viewmodels.loginviewmodel.LoginViewModelFactory
+-
++import com.jejhdmdv.proyecto_pdm.ui.viewmodels.vetloginviewmodel.VetLoginViewModel
++import com. jejhdmdv. proyecto_pdm. ui. viewmodels. vetloginviewmodel. VetLoginViewModelFactory
++import com. jejhdmdv. proyecto_pdm. ui. viewmodels. vetregisterviewmodel. VetRegisterViewModel
++import com. jejhdmdv. proyecto_pdm. ui. viewmodels. vetregisterviewmodel. VetRegisterViewModelFactory
+ 
+ class MainActivity : ComponentActivity() {
+     override fun onCreate(savedInstanceState: Bundle?) {
+@@ -45,6 +45,11 @@ class MainActivity : ComponentActivity() {
+                 }
+ 
+                 val loginViewModelFactory = LoginViewModelFactory(authRepository)
++                val vetLoginViewModelFactory = VetLoginViewModelFactory(authRepository)
++                val vetLoginViewModel: VetLoginViewModel = viewModel(factory = vetLoginViewModelFactory)
++                val vetRegisterViewModel: VetRegisterViewModel = viewModel(
++                    factory = VetRegisterViewModelFactory(authRepository)
++                )
+ 
+                 val loginViewModel: LoginViewModel = viewModel(factory = loginViewModelFactory)
+ 
+@@ -79,6 +84,8 @@ class MainActivity : ComponentActivity() {
+                     NavGraph(
+                         navController = navController,
+                         loginViewModel = loginViewModel,
++                        vetLoginViewModel = vetLoginViewModel,
++                        vetRegisterViewModel = vetRegisterViewModel,
+                         onGoogleSignInClick = {
+                             val signInIntent = googleSignInClient.signInIntent
+ 
+diff --git a/app/src/main/java/com/jejhdmdv/proyecto_pdm/data/remote/AuthApi.kt b/app/src/main/java/com/jejhdmdv/proyecto_pdm/data/remote/AuthApi.kt
+index 20b0d49..f78ae1d 100644
+--- a/app/src/main/java/com/jejhdmdv/proyecto_pdm/data/remote/AuthApi.kt
++++ b/app/src/main/java/com/jejhdmdv/proyecto_pdm/data/remote/AuthApi.kt
+@@ -5,7 +5,7 @@ import com.jejhdmdv.proyecto_pdm.model.login.LoginRequest
+ import com.jejhdmdv.proyecto_pdm.model.login.LoginResponse
+ import com.jejhdmdv.proyecto_pdm.model.login.RegisterRequest
+ import com.jejhdmdv.proyecto_pdm.model.login.RegisterResponse
+-import com.jejhdmdv.proyecto_pdm.model.login.VetRegisterRequest
++import com. jejhdmdv. proyecto_pdm. model. login. VetRegisterRequest
+ import retrofit2.Response
+ import retrofit2.http.Body
+ import retrofit2.http.POST
+diff --git a/app/src/main/java/com/jejhdmdv/proyecto_pdm/data/repository/AuthRepository.kt b/app/src/main/java/com/jejhdmdv/proyecto_pdm/data/repository/AuthRepository.kt
+index 8b1e4d6..368b159 100644
+--- a/app/src/main/java/com/jejhdmdv/proyecto_pdm/data/repository/AuthRepository.kt
++++ b/app/src/main/java/com/jejhdmdv/proyecto_pdm/data/repository/AuthRepository.kt
+@@ -7,8 +7,8 @@ import com.jejhdmdv.proyecto_pdm.model.login.LoginRequest
+ import com.jejhdmdv.proyecto_pdm.model.login.LoginResponse
+ import com.jejhdmdv.proyecto_pdm.model.login.RegisterRequest
+ import com.jejhdmdv.proyecto_pdm.model.login.RegisterResponse
+-import com.jejhdmdv.proyecto_pdm.model.login.VetRegisterRequest
+ import com.jejhdmdv.proyecto_pdm.utils.Resource
++import com. jejhdmdv. proyecto_pdm. model. login. VetRegisterRequest
+ 
+ class AuthRepository(private val authApiService: AuthApiService) {
+ 
+diff --git a/app/src/main/java/com/jejhdmdv/proyecto_pdm/model/login/Register.kt b/app/src/main/java/com/jejhdmdv/proyecto_pdm/model/login/Register.kt
+index 5a34de4..afa2d2c 100644
+--- a/app/src/main/java/com/jejhdmdv/proyecto_pdm/model/login/Register.kt
++++ b/app/src/main/java/com/jejhdmdv/proyecto_pdm/model/login/Register.kt
+@@ -21,9 +21,9 @@ data class VetRegisterRequest(
+     val email: String,
+     val telefono: String,
+     val direccion: String,
+-    val numero_de_registro: String, // Nuevo campo para veterinarios
+     val password: String,
+-    val passwordConfirmation: String
++    val passwordConfirmation: String,
++
+ )
+ 
+ data class GoogleSignInRequest(
+diff --git a/app/src/main/java/com/jejhdmdv/proyecto_pdm/navigation/NavGraph.kt b/app/src/main/java/com/jejhdmdv/proyecto_pdm/navigation/NavGraph.kt
+index 488b818..6e53137 100644
+--- a/app/src/main/java/com/jejhdmdv/proyecto_pdm/navigation/NavGraph.kt
++++ b/app/src/main/java/com/jejhdmdv/proyecto_pdm/navigation/NavGraph.kt
+@@ -46,6 +46,11 @@ import com.jejhdmdv.proyecto_pdm.ui.screens.CartScreen
+ import com.jejhdmdv.proyecto_pdm.ui.screens.PaymentScreen
+ import com.jejhdmdv.proyecto_pdm.ui.viewmodels.loginviewmodel.LoginViewModel
+ import com.jejhdmdv.proyecto_pdm.utils.Resource
++import com. jejhdmdv. proyecto_pdm. ui. screens. VetLoginScreen
++import com.jejhdmdv.proyecto_pdm.ui.viewmodels.vetloginviewmodel.VetLoginViewModel
++import com. jejhdmdv. proyecto_pdm. ui. screens. VetRegisterScreen
++import com. jejhdmdv. proyecto_pdm. ui. viewmodels. vetregisterviewmodel. VetRegisterViewModel
++
+ 
+ /**
+  * Composable que define el grafo de navegación de la aplicación
+@@ -55,6 +60,8 @@ import com.jejhdmdv.proyecto_pdm.utils.Resource
+ fun NavGraph(
+     navController: NavHostController,
+     loginViewModel: LoginViewModel,
++    vetLoginViewModel: VetLoginViewModel,
++    vetRegisterViewModel: VetRegisterViewModel,
+     onGoogleSignInClick: () -> Unit
+ ) {
+     NavHost(
+@@ -65,10 +72,8 @@ fun NavGraph(
+         composable(Screen.Login.route) {
+ 
+             val loginViewModel: LoginViewModel = loginViewModel
+-            // El contexto para google sign-In
+             val context = LocalContext.current
+ 
+-            // Logica del launcher para recibir el resultado de Google
+             val launcher = rememberLauncherForActivityResult(
+                 contract = ActivityResultContracts.StartActivityForResult()
+             ) { result ->
+@@ -80,35 +85,29 @@ fun NavGraph(
+                         if (idToken != null) {
+                             loginViewModel.signInWithGoogle(idToken)
+                         } else {
+-                            // Manejar el caso de token nulo
+                             Toast.makeText(context, "Error: idToken de Google es nulo.", Toast.LENGTH_SHORT).show()
+                         }
+                     } catch (e: ApiException) {
+-                        // Manejar error de la API
+                         Toast.makeText(context, "Error de Google Sign-In: ${e.statusCode}", Toast.LENGTH_SHORT).show()
+                     }
+                 }
+             }
+ 
+-            // Logic de navegacion para cuando el login sea exitoso
+             val loginResult by loginViewModel.loginResult.collectAsStateWithLifecycle()
+             LaunchedEffect(loginResult) {
+                 if (loginResult is Resource.Success) {
+-                    // Navega a la pantalla principal y limpia la pila de navegación
+                     navController.navigate(Screen.Home.route) {
+                         popUpTo(Screen.Login.route) { inclusive = true }
+                     }
+                 }
+             }
+ 
+-            // LoginScreen con toda la logica conectada
+             LoginScreen(
+                 viewModel = loginViewModel,
+                 onNavigateToRegister = {
+                     navController.navigate(Screen.Register.route)
+                 },
+                 onGoogleSignInClick = {
+-                    // Preparamos y lanzamos el intent de Google al hacer clic
+                     val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                         .requestEmail()
+                         .requestIdToken("75282745771-197vm5m67kuec92bj5o22ju2bf2ap4kl.apps.googleusercontent.com")
+@@ -118,6 +117,10 @@ fun NavGraph(
+                     googleSignInClient.signOut().addOnCompleteListener {
+                         launcher.launch(googleSignInClient.signInIntent)
+                     }
++                },
++
++                onNavigateToVetLogin = {
++                    navController.navigate(Screen.VetLogin.route)
+                 }
+             )
+         }
+@@ -159,6 +162,31 @@ fun NavGraph(
+                 }
+             )
+         }
++ // Pantalla de login del vet
++        composable(Screen.VetLogin.route) {
++            VetLoginScreen(
++                viewModel = vetLoginViewModel,
++                onNavigateBack = { navController.popBackStack() },
++                onNavigateToVetRegister = {
++                    navController.navigate(Screen.VetRegister.route)
++                }
++            )
++
++        }
++        //
++        composable(Screen.VetRegister.route) {
++            VetRegisterScreen(
++                viewModel = vetRegisterViewModel,
++                onNavigateBack = { navController.popBackStack() },
++                onRegisterSuccess = {
++                    navController.navigate(Screen.VetLogin.route) {
++                        popUpTo(Screen.VetRegister.route) { inclusive = true }
++                    }
++                }
++            )
++
++
++    }
+ 
+         // Pantalla de registro de mascota
+         composable(Screen.PetRegistration.route) {
+@@ -419,4 +447,3 @@ private fun PlaceholderScreen(
+         }
+     }
+ }
+-
+diff --git a/app/src/main/java/com/jejhdmdv/proyecto_pdm/navigation/Screen.kt b/app/src/main/java/com/jejhdmdv/proyecto_pdm/navigation/Screen.kt
+index eed811c..8f39631 100644
+--- a/app/src/main/java/com/jejhdmdv/proyecto_pdm/navigation/Screen.kt
++++ b/app/src/main/java/com/jejhdmdv/proyecto_pdm/navigation/Screen.kt
+@@ -8,6 +8,8 @@ sealed class Screen(val route: String) {
+     // Pantallas de autenticación
+     object Login : Screen("login")
+     object Register : Screen("register")
++    object VetLogin : Screen("vet_login")
++    object VetRegister : Screen("vet_register")
+ 
+     // Pantalla principal
+     object Home : Screen("home")
+diff --git a/app/src/main/java/com/jejhdmdv/proyecto_pdm/ui/screens/LoginScreen.kt b/app/src/main/java/com/jejhdmdv/proyecto_pdm/ui/screens/LoginScreen.kt
+index 1c0f740..1e9187f 100644
+--- a/app/src/main/java/com/jejhdmdv/proyecto_pdm/ui/screens/LoginScreen.kt
++++ b/app/src/main/java/com/jejhdmdv/proyecto_pdm/ui/screens/LoginScreen.kt
+@@ -62,7 +62,8 @@ import androidx.compose.ui.draw.rotate
+ fun LoginScreen(
+     onGoogleSignInClick: () -> Unit,
+     viewModel: LoginViewModel,
+-    onNavigateToRegister: () -> Unit
++    onNavigateToRegister: () -> Unit,
++    onNavigateToVetLogin: () -> Unit
+ ) {
+     val context = LocalContext.current
+ 
+@@ -250,6 +251,16 @@ fun LoginScreen(
+                 modifier = Modifier.clickable { onNavigateToRegister() }
+             )
+ 
++            Text(
++                text = "¿Eres veterinario? Inicia sesión aquí",
++                color = Color.Blue,
++                fontSize = 14.sp,
++                modifier = Modifier
++                    .padding(top = 8.dp)
++                    .clickable { onNavigateToVetLogin() }
++            )
++
++
+             Text(
+                 text = "¿Olvidó su contraseña?",
+                 color = Color.Black,
+@@ -257,6 +268,7 @@ fun LoginScreen(
+                 modifier = Modifier.padding(top = 8.dp)
+             )
+ 
++
+             Spacer(modifier = Modifier.weight(1f))
+         }
+ 
+diff --git a/app/src/main/java/com/jejhdmdv/proyecto_pdm/ui/viewmodels/loginviewmodel/LoginViewModel.kt b/app/src/main/java/com/jejhdmdv/proyecto_pdm/ui/viewmodels/loginviewmodel/LoginViewModel.kt
+index b450045..6f9ee74 100644
+--- a/app/src/main/java/com/jejhdmdv/proyecto_pdm/ui/viewmodels/loginviewmodel/LoginViewModel.kt
++++ b/app/src/main/java/com/jejhdmdv/proyecto_pdm/ui/viewmodels/loginviewmodel/LoginViewModel.kt
+@@ -7,7 +7,7 @@ import com.jejhdmdv.proyecto_pdm.model.login.LoginRequest
+ import com.jejhdmdv.proyecto_pdm.model.login.LoginResponse
+ import com.jejhdmdv.proyecto_pdm.model.login.RegisterRequest
+ import com.jejhdmdv.proyecto_pdm.model.login.RegisterResponse
+-import com.jejhdmdv.proyecto_pdm.model.login.VetRegisterRequest
++import com. jejhdmdv.proyecto_pdm.model.login.VetRegisterRequest
+ import com.jejhdmdv.proyecto_pdm.utils.Resource
+ import kotlinx.coroutines.flow.MutableStateFlow
+ import kotlinx.coroutines.flow.StateFlow

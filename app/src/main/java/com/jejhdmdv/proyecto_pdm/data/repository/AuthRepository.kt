@@ -8,6 +8,7 @@ import com.jejhdmdv.proyecto_pdm.model.login.LoginResponse
 import com.jejhdmdv.proyecto_pdm.model.login.RegisterRequest
 import com.jejhdmdv.proyecto_pdm.model.login.RegisterResponse
 import com.jejhdmdv.proyecto_pdm.utils.Resource
+import com. jejhdmdv. proyecto_pdm. model. login. VetRegisterRequest
 
 
 

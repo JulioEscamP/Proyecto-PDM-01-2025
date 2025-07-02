@@ -34,6 +34,15 @@ import com.jejhdmdv.proyecto_pdm.ui.screens.ProductDetailScreen
 import com.jejhdmdv.proyecto_pdm.ui.screens.CartScreen
 import com.jejhdmdv.proyecto_pdm.ui.screens.PaymentScreen
 import com.jejhdmdv.proyecto_pdm.ui.viewmodels.loginviewmodel.LoginViewModel
+<<<<<<< Updated upstream
+=======
+import com.jejhdmdv.proyecto_pdm.utils.Resource
+import com. jejhdmdv. proyecto_pdm. ui. screens. VetLoginScreen
+import com.jejhdmdv.proyecto_pdm.ui.viewmodels.vetloginviewmodel.VetLoginViewModel
+import com. jejhdmdv. proyecto_pdm. ui. screens. VetRegisterScreen
+import com. jejhdmdv. proyecto_pdm. ui. viewmodels. vetregisterviewmodel. VetRegisterViewModel
+
+>>>>>>> Stashed changes
 
 /**
  * Composable que define el grafo de navegación de la aplicación
@@ -43,6 +52,8 @@ import com.jejhdmdv.proyecto_pdm.ui.viewmodels.loginviewmodel.LoginViewModel
 fun NavGraph(
     navController: NavHostController,
     loginViewModel: LoginViewModel,
+    vetLoginViewModel: VetLoginViewModel,
+    vetRegisterViewModel: VetRegisterViewModel,
     onGoogleSignInClick: () -> Unit
 ) {
     NavHost(
@@ -51,11 +62,64 @@ fun NavGraph(
     ) {
         // Pantalla de inicio de sesión
         composable(Screen.Login.route) {
+<<<<<<< Updated upstream
+=======
+
+            val loginViewModel: LoginViewModel = loginViewModel
+            val context = LocalContext.current
+
+            val launcher = rememberLauncherForActivityResult(
+                contract = ActivityResultContracts.StartActivityForResult()
+            ) { result ->
+                if (result.resultCode == Activity.RESULT_OK) {
+                    val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+                    try {
+                        val account = task.getResult(ApiException::class.java)!!
+                        val idToken = account.idToken
+                        if (idToken != null) {
+                            loginViewModel.signInWithGoogle(idToken)
+                        } else {
+                            Toast.makeText(context, "Error: idToken de Google es nulo.", Toast.LENGTH_SHORT).show()
+                        }
+                    } catch (e: ApiException) {
+                        Toast.makeText(context, "Error de Google Sign-In: ${e.statusCode}", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
+            val loginResult by loginViewModel.loginResult.collectAsStateWithLifecycle()
+            LaunchedEffect(loginResult) {
+                if (loginResult is Resource.Success) {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Login.route) { inclusive = true }
+                    }
+                }
+            }
+
+>>>>>>> Stashed changes
             LoginScreen(
                 onGoogleSignInClick = onGoogleSignInClick,
                 viewModel = loginViewModel,
                 onNavigateToRegister = {
                     navController.navigate(Screen.Register.route)
+<<<<<<< Updated upstream
+=======
+                },
+                onGoogleSignInClick = {
+                    val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                        .requestEmail()
+                        .requestIdToken("75282745771-197vm5m67kuec92bj5o22ju2bf2ap4kl.apps.googleusercontent.com")
+                        .build()
+                    val googleSignInClient = GoogleSignIn.getClient(context, gso)
+
+                    googleSignInClient.signOut().addOnCompleteListener {
+                        launcher.launch(googleSignInClient.signInIntent)
+                    }
+                },
+
+                onNavigateToVetLogin = {
+                    navController.navigate(Screen.VetLogin.route)
+>>>>>>> Stashed changes
                 }
             )
         }
@@ -89,6 +153,31 @@ fun NavGraph(
                 }
             )
         }
+ // Pantalla de login del vet
+        composable(Screen.VetLogin.route) {
+            VetLoginScreen(
+                viewModel = vetLoginViewModel,
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToVetRegister = {
+                    navController.navigate(Screen.VetRegister.route)
+                }
+            )
+
+        }
+        //
+        composable(Screen.VetRegister.route) {
+            VetRegisterScreen(
+                viewModel = vetRegisterViewModel,
+                onNavigateBack = { navController.popBackStack() },
+                onRegisterSuccess = {
+                    navController.navigate(Screen.VetLogin.route) {
+                        popUpTo(Screen.VetRegister.route) { inclusive = true }
+                    }
+                }
+            )
+
+
+    }
 
         // Pantalla de registro de mascota
         composable(Screen.PetRegistration.route) {
@@ -349,4 +438,3 @@ private fun PlaceholderScreen(
         }
     }
 }
-

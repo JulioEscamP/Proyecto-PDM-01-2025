@@ -5,6 +5,12 @@ import androidx.lifecycle.viewModelScope
 import com.jejhdmdv.proyecto_pdm.data.repository.AuthRepository
 import com.jejhdmdv.proyecto_pdm.model.login.LoginRequest
 import com.jejhdmdv.proyecto_pdm.model.login.LoginResponse
+<<<<<<< Updated upstream
+=======
+import com.jejhdmdv.proyecto_pdm.model.login.RegisterRequest
+import com.jejhdmdv.proyecto_pdm.model.login.RegisterResponse
+import com. jejhdmdv.proyecto_pdm.model.login.VetRegisterRequest
+>>>>>>> Stashed changes
 import com.jejhdmdv.proyecto_pdm.utils.Resource
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

@@ -25,10 +25,19 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
 import com.jejhdmdv.proyecto_pdm.data.remote.RetrofitClient
 import com.jejhdmdv.proyecto_pdm.data.repository.AuthRepository
+<<<<<<< Updated upstream
 import com.jejhdmdv.proyecto_pdm.navigation.NavGraph
 import com.jejhdmdv.proyecto_pdm.ui.theme.ProyectoPDMTheme
 import com.jejhdmdv.proyecto_pdm.ui.viewmodels.loginviewmodel.LoginViewModel
 import com.jejhdmdv.proyecto_pdm.ui.viewmodels.loginviewmodel.LoginViewModelFactory
+=======
+import com.jejhdmdv.proyecto_pdm.ui.theme.ProyectoPDMTheme
+import com.jejhdmdv.proyecto_pdm.ui.viewmodels.loginviewmodel.LoginViewModelFactory
+import com.jejhdmdv.proyecto_pdm.ui.viewmodels.vetloginviewmodel.VetLoginViewModel
+import com. jejhdmdv. proyecto_pdm. ui. viewmodels. vetloginviewmodel. VetLoginViewModelFactory
+import com. jejhdmdv. proyecto_pdm. ui. viewmodels. vetregisterviewmodel. VetRegisterViewModel
+import com. jejhdmdv. proyecto_pdm. ui. viewmodels. vetregisterviewmodel. VetRegisterViewModelFactory
+>>>>>>> Stashed changes
 
 class MainActivity : ComponentActivity() {
 
@@ -72,6 +81,53 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             ProyectoPDMTheme {
+<<<<<<< Updated upstream
+=======
+                val navController = rememberNavController()
+                val context = LocalContext.current
+
+                val authApiService = remember {
+                    RetrofitClient.authApiService
+                }
+
+                val authRepository = remember {
+                    AuthRepository(authApiService)
+                }
+
+                val loginViewModelFactory = LoginViewModelFactory(authRepository)
+                val vetLoginViewModelFactory = VetLoginViewModelFactory(authRepository)
+                val vetLoginViewModel: VetLoginViewModel = viewModel(factory = vetLoginViewModelFactory)
+                val vetRegisterViewModel: VetRegisterViewModel = viewModel(
+                    factory = VetRegisterViewModelFactory(authRepository)
+                )
+
+                val loginViewModel: LoginViewModel = viewModel(factory = loginViewModelFactory)
+
+                val googleSignInClient = remember {
+                    GoogleSignIn.getClient(
+                        context,
+                        GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                            .requestEmail()
+                            .build()
+                    )
+                }
+
+                val googleSignInLauncher = rememberLauncherForActivityResult(
+                    contract = ActivityResultContracts.StartActivityForResult()
+                ) { result ->
+                    val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
+                    try {
+                        val account = task.getResult(ApiException::class.java)
+                        // estos son handler de errores, need to beef up el viewmodel
+                    } catch (e: ApiException) {
+
+                    }
+                }
+
+
+
+
+>>>>>>> Stashed changes
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
@@ -81,6 +137,8 @@ class MainActivity : ComponentActivity() {
                     NavGraph(
                         navController = navController,
                         loginViewModel = loginViewModel,
+                        vetLoginViewModel = vetLoginViewModel,
+                        vetRegisterViewModel = vetRegisterViewModel,
                         onGoogleSignInClick = {
                             val signInIntent = googleSignInClient.signInIntent
                             googleSignInLauncher.launch(signInIntent)

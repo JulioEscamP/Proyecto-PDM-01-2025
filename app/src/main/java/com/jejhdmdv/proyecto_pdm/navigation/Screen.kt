@@ -8,6 +8,8 @@ sealed class Screen(val route: String) {
     // Pantallas de autenticación
     object Login : Screen("login")
     object Register : Screen("register")
+    object VetLogin : Screen("vet_login")
+    object VetRegister : Screen("vet_register")
 
     // Pantalla principal
     object Home : Screen("home")
