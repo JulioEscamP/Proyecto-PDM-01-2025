@@ -10,6 +10,8 @@ import com.jejhdmdv.proyecto_pdm.model.login.RegisterResponse
 import com.jejhdmdv.proyecto_pdm.model.login.VetRegisterRequest
 import com.jejhdmdv.proyecto_pdm.utils.Resource
 
+
+
 class AuthRepository(private val authApiService: AuthApiService) {
 
     suspend fun login(request: LoginRequest): Resource<LoginResponse> {
@@ -41,17 +43,14 @@ class AuthRepository(private val authApiService: AuthApiService) {
                 if (body != null) {
                     Resource.Success(body)
                 } else {
-
-                    Resource.Error<LoginResponse>("Respuesta de Google Login vacía")
+                    Resource.Error("Respuesta de Google Login vacía")
                 }
             } else {
                 val errorBody = response.errorBody()?.string()
-
-                Resource.Error<LoginResponse>("Error de Google Login: ${response.code()} - ${errorBody ?: response.message()}")
+                Resource.Error("Error de Google Login: ${response.code()} - ${errorBody ?: response.message()}")
             }
         } catch (e: Exception) {
-
-            Resource.Error<LoginResponse>("Error de red al intentar Google Login: ${e.localizedMessage}")
+            Resource.Error("Error de red al intentar Google Login: ${e.localizedMessage}")
         }
     }
 
@@ -76,11 +75,12 @@ class AuthRepository(private val authApiService: AuthApiService) {
                 response.body()?.let { Resource.Success(it) } ?: Resource.Error("Respuesta de registro de veterinario vacía")
             } else {
                 val errorBody = response.errorBody()?.string()
-                Resource.Error("Error de registro de veterinario: ${response.code()} - ${errorBody ?: response.message()}")
+                Resource.Error<RegisterResponse>("Error de registro: ${response.code()} - ${errorBody ?: response.message()}")
             }
         } catch (e: Exception) {
-            Resource.Error("Error de red al intentar registrar veterinario: ${e.localizedMessage}")
+            Resource.Error<RegisterResponse>("Error de red al intentar registrar: ${e.localizedMessage}")
         }
     }
+
 
 }

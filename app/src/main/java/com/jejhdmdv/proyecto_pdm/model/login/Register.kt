@@ -21,7 +21,6 @@ data class VetRegisterRequest(
     val email: String,
     val telefono: String,
     val direccion: String,
-    val numero_de_registro: String, // Nuevo campo para veterinarios
     val password: String,
     val passwordConfirmation: String
 )

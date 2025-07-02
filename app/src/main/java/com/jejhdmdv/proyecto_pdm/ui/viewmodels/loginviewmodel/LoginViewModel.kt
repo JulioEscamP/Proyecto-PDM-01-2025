@@ -67,4 +67,3 @@ class LoginViewModel(private val authRepository: AuthRepository) : ViewModel() {
         _vetRegisterResult.value = Resource.Idle()
     }
 }
-

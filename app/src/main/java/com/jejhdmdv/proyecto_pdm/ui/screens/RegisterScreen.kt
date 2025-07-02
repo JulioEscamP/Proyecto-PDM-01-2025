@@ -45,6 +45,7 @@ import com.jejhdmdv.proyecto_pdm.model.login.RegisterRequest
 import com.jejhdmdv.proyecto_pdm.ui.viewmodels.loginviewmodel.LoginViewModel
 import com.jejhdmdv.proyecto_pdm.utils.Resource
 
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(

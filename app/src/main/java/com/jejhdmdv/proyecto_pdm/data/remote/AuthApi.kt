@@ -12,16 +12,17 @@ import retrofit2.http.POST
 
 interface AuthApiService {
 
-    @POST("auth/login")
+    @POST("auth/login") // TODO: La ruta en el backend para autentificar el login
     suspend fun login(@Body request: LoginRequest): Response<LoginResponse>
 
     @POST("auth/register")
     suspend fun register(@Body request: RegisterRequest): Response<RegisterResponse>
 
-    @POST("auth/google-login")
+    @POST("auth/google-login") //Google Login Endpoint
     suspend fun googleLogin(@Body request: GoogleSignInRequest): Response<LoginResponse>
 
-    // --- NUEVO ENDPOINT PARA REGISTRO DE VETERINARIO ---
-    @POST("auth/vet-register") // TODO: Asegúrate de que esta sea la ruta correcta en tu backend
+    @POST("veterinarios/register")
     suspend fun vetRegister(@Body request: VetRegisterRequest): Response<RegisterResponse>
+
+
 }

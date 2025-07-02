@@ -62,7 +62,8 @@ import androidx.compose.ui.draw.rotate
 fun LoginScreen(
     onGoogleSignInClick: () -> Unit,
     viewModel: LoginViewModel,
-    onNavigateToRegister: () -> Unit
+    onNavigateToRegister: () -> Unit,
+    onNavigateToVetLogin: () -> Unit
 ) {
     val context = LocalContext.current
 
@@ -251,11 +252,22 @@ fun LoginScreen(
             )
 
             Text(
+                text = "¿Eres veterinario? Inicia sesión aquí",
+                color = Color.Blue,
+                fontSize = 14.sp,
+                modifier = Modifier
+                    .padding(top = 8.dp)
+                    .clickable { onNavigateToVetLogin() }
+            )
+
+
+            Text(
                 text = "¿Olvidó su contraseña?",
                 color = Color.Black,
                 fontSize = 14.sp,
                 modifier = Modifier.padding(top = 8.dp)
             )
+
 
             Spacer(modifier = Modifier.weight(1f))
         }

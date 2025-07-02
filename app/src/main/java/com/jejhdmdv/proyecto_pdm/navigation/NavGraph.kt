@@ -46,6 +46,10 @@ import com.jejhdmdv.proyecto_pdm.ui.screens.CartScreen
 import com.jejhdmdv.proyecto_pdm.ui.screens.PaymentScreen
 import com.jejhdmdv.proyecto_pdm.ui.viewmodels.loginviewmodel.LoginViewModel
 import com.jejhdmdv.proyecto_pdm.utils.Resource
+import com.jejhdmdv. proyecto_pdm. ui. viewmodels. vetloginviewmodel.VetLoginViewModel
+import com.jejhdmdv.proyecto_pdm.ui.viewmodels. vetregisterviewmodel.VetRegisterViewModel
+import com.jejhdmdv.proyecto_pdm.ui.screens.VetLoginScreen
+import com.jejhdmdv.proyecto_pdm.ui.screens.VetRegisterScreen
 
 /**
  * Composable que define el grafo de navegación de la aplicación
@@ -55,13 +59,15 @@ import com.jejhdmdv.proyecto_pdm.utils.Resource
 fun NavGraph(
     navController: NavHostController,
     loginViewModel: LoginViewModel,
+    vetLoginViewModel: VetLoginViewModel,
+    vetRegisterViewModel: VetRegisterViewModel,
     onGoogleSignInClick: () -> Unit
 ) {
     NavHost(
         navController = navController,
         startDestination = Screen.Login.route
     ) {
-        // --- PANTALLA DE LOGIN ---
+        // Pantalla de inicio de sesión
         composable(Screen.Login.route) {
 
             val loginViewModel: LoginViewModel = loginViewModel
@@ -107,8 +113,8 @@ fun NavGraph(
                 onNavigateToRegister = {
                     navController.navigate(Screen.Register.route)
                 },
+
                 onGoogleSignInClick = {
-                    // Preparamos y lanzamos el intent de Google al hacer clic
                     val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                         .requestEmail()
                         .requestIdToken("75282745771-197vm5m67kuec92bj5o22ju2bf2ap4kl.apps.googleusercontent.com")
@@ -118,6 +124,10 @@ fun NavGraph(
                     googleSignInClient.signOut().addOnCompleteListener {
                         launcher.launch(googleSignInClient.signInIntent)
                     }
+                },
+
+                onNavigateToVetLogin = {
+                    navController.navigate(Screen.VetLogin.route)
                 }
             )
         }
@@ -159,6 +169,31 @@ fun NavGraph(
                 }
             )
         }
+ // Pantalla de login del vet
+        composable(Screen.VetLogin.route) {
+            VetLoginScreen(
+                viewModel = vetLoginViewModel,
+                onNavigateBack = { navController.popBackStack() },
+                onNavigateToVetRegister = {
+                    navController.navigate(Screen.VetRegister.route)
+                }
+            )
+
+        }
+        //
+        composable(Screen.VetRegister.route) {
+            VetRegisterScreen(
+                viewModel = vetRegisterViewModel,
+                onNavigateBack = { navController.popBackStack() },
+                onRegisterSuccess = {
+                    navController.navigate(Screen.VetLogin.route) {
+                        popUpTo(Screen.VetRegister.route) { inclusive = true }
+                    }
+                }
+            )
+
+
+    }
 
         // Pantalla de registro de mascota
         composable(Screen.PetRegistration.route) {

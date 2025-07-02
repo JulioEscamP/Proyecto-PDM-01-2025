@@ -25,6 +25,10 @@ import com.jejhdmdv.proyecto_pdm.navigation.NavGraph
 import com.jejhdmdv.proyecto_pdm.ui.theme.ProyectoPDMTheme
 import com.jejhdmdv.proyecto_pdm.ui.viewmodels.calendarioviewmodel.ReminderViewModel
 import com.jejhdmdv.proyecto_pdm.ui.viewmodels.loginviewmodel.LoginViewModelFactory
+import com.jejhdmdv.proyecto_pdm.ui.viewmodels.vetloginviewmodel.VetLoginViewModel
+import com.jejhdmdv.proyecto_pdm.ui.viewmodels.vetloginviewmodel.VetLoginViewModelFactory
+import com.jejhdmdv.proyecto_pdm.ui.viewmodels.vetregisterviewmodel.VetRegisterViewModel
+import com.jejhdmdv.proyecto_pdm.ui.viewmodels.vetregisterviewmodel.VetRegisterViewModelFactory
 
 
 class MainActivity : ComponentActivity() {
@@ -43,9 +47,10 @@ class MainActivity : ComponentActivity() {
                     AuthRepository(authApiService)
                 }
 
-                val loginViewModelFactory = LoginViewModelFactory(authRepository)
-
-                val loginViewModel: LoginViewModel = viewModel(factory = loginViewModelFactory)
+                // Factories para los ViewModels
+                val loginViewModel: LoginViewModel = viewModel(factory = LoginViewModelFactory(authRepository))
+                val vetLoginViewModel: VetLoginViewModel = viewModel(factory = VetLoginViewModelFactory(authRepository))
+                val vetRegisterViewModel: VetRegisterViewModel = viewModel(factory = VetRegisterViewModelFactory(authRepository))
 
                 val googleSignInClient = remember {
                     GoogleSignIn.getClient(
@@ -78,10 +83,12 @@ class MainActivity : ComponentActivity() {
                     NavGraph(
                         navController = navController,
                         loginViewModel = loginViewModel,
+                        vetLoginViewModel = vetLoginViewModel,
+                        vetRegisterViewModel = vetRegisterViewModel,
                         onGoogleSignInClick = {
-                            val signInIntent = googleSignInClient.signInIntent
-
-                            googleSignInLauncher.launch(signInIntent)
+                            googleSignInClient.signOut().addOnCompleteListener {
+                                googleSignInLauncher.launch(googleSignInClient.signInIntent)
+                            }
                         }
                     )
                 }
