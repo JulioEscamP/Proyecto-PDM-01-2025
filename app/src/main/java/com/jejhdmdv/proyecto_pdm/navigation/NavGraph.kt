@@ -1,53 +1,24 @@
 package com.jejhdmdv.proyecto_pdm.navigation
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
-import androidx.compose.material3.Button
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import android.app.Activity
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.*
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import com.jejhdmdv.proyecto_pdm.ui.screens.EmergencyScreen
-import com.jejhdmdv.proyecto_pdm.ui.screens.HomeScreen
-import com.jejhdmdv.proyecto_pdm.ui.screens.LoginScreen
-import com.jejhdmdv.proyecto_pdm.ui.screens.PetRegistrationScreen
-import com.jejhdmdv.proyecto_pdm.ui.screens.PetDetailRegistrationScreen
-import com.jejhdmdv.proyecto_pdm.ui.screens.PetType
-import com.jejhdmdv.proyecto_pdm.ui.screens.RegisterScreen
-import com.jejhdmdv.proyecto_pdm.ui.screens.CalendarScreen
-import com.jejhdmdv.proyecto_pdm.ui.screens.SettingsScreen
-import com.jejhdmdv.proyecto_pdm.ui.screens.FAQScreen
-import com.jejhdmdv.proyecto_pdm.ui.screens.TermsAndConditionsScreen
-import com.jejhdmdv.proyecto_pdm.ui.screens.ReportProblemScreen
-import com.jejhdmdv.proyecto_pdm.ui.screens.StoreScreen
-import com.jejhdmdv.proyecto_pdm.ui.screens.ProductDetailScreen
-import com.jejhdmdv.proyecto_pdm.ui.screens.CartScreen
-import com.jejhdmdv.proyecto_pdm.ui.screens.PaymentScreen
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.jejhdmdv.proyecto_pdm.ui.screens.*
 import com.jejhdmdv.proyecto_pdm.ui.viewmodels.loginviewmodel.LoginViewModel
-<<<<<<< Updated upstream
-=======
-import com.jejhdmdv.proyecto_pdm.utils.Resource
-import com. jejhdmdv. proyecto_pdm. ui. screens. VetLoginScreen
 import com.jejhdmdv.proyecto_pdm.ui.viewmodels.vetloginviewmodel.VetLoginViewModel
-import com. jejhdmdv. proyecto_pdm. ui. screens. VetRegisterScreen
-import com. jejhdmdv. proyecto_pdm. ui. viewmodels. vetregisterviewmodel. VetRegisterViewModel
+import com.jejhdmdv.proyecto_pdm.ui.viewmodels.vetregisterviewmodel.VetRegisterViewModel
+import com.jejhdmdv.proyecto_pdm.utils.Resource
 
->>>>>>> Stashed changes
-
-/**
- * Composable que define el grafo de navegación de la aplicación
- * Maneja todas las rutas y transiciones entre pantallas
- */
 @Composable
 fun NavGraph(
     navController: NavHostController,
@@ -60,14 +31,10 @@ fun NavGraph(
         navController = navController,
         startDestination = Screen.Login.route
     ) {
-        // Pantalla de inicio de sesión
+
+        // Login de usuario
         composable(Screen.Login.route) {
-<<<<<<< Updated upstream
-=======
-
-            val loginViewModel: LoginViewModel = loginViewModel
             val context = LocalContext.current
-
             val launcher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.StartActivityForResult()
             ) { result ->
@@ -96,75 +63,57 @@ fun NavGraph(
                 }
             }
 
->>>>>>> Stashed changes
             LoginScreen(
-                onGoogleSignInClick = onGoogleSignInClick,
                 viewModel = loginViewModel,
-                onNavigateToRegister = {
-                    navController.navigate(Screen.Register.route)
-<<<<<<< Updated upstream
-=======
-                },
+                onNavigateToRegister = { navController.navigate(Screen.Register.route) },
                 onGoogleSignInClick = {
                     val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                         .requestEmail()
                         .requestIdToken("75282745771-197vm5m67kuec92bj5o22ju2bf2ap4kl.apps.googleusercontent.com")
                         .build()
                     val googleSignInClient = GoogleSignIn.getClient(context, gso)
-
                     googleSignInClient.signOut().addOnCompleteListener {
                         launcher.launch(googleSignInClient.signInIntent)
                     }
                 },
-
-                onNavigateToVetLogin = {
-                    navController.navigate(Screen.VetLogin.route)
->>>>>>> Stashed changes
-                }
+                onNavigateToVetLogin = { navController.navigate(Screen.VetLogin.route) }
             )
         }
 
-        // Pantalla de registro
+        // Registro de usuario
         composable(Screen.Register.route) {
             RegisterScreen(
-                onNavigateToLogin = {
-                    navController.popBackStack()
+                viewModel = loginViewModel,
+                onNavigateToLogin = { navController.popBackStack() },
+                onRegisterSuccess = {
+                    navController.navigate(Screen.Home.route) {
+                        popUpTo(Screen.Login.route) { inclusive = true }
+                    }
                 }
             )
         }
 
-        // Pantalla principal (Home)
+        // Home
         composable(Screen.Home.route) {
             HomeScreen(
-                onNavigateToEmergency = {
-                    navController.navigate(Screen.Emergency.route)
-                },
-                onNavigateToAppointments = {
-                    navController.navigate(Screen.Appointments.route)
-                },
-                onNavigateToStore = {
-                    navController.navigate(Screen.Store.route)
-                },
-                onNavigateToSettings = {
-                    navController.navigate(Screen.Settings.route)
-                },
-                onNavigateToPetRegistration = {
-                    navController.navigate(Screen.PetRegistration.route)
-                }
+                onNavigateToEmergency = { navController.navigate(Screen.Emergency.route) },
+                onNavigateToAppointments = { navController.navigate(Screen.Appointments.route) },
+                onNavigateToStore = { navController.navigate(Screen.Store.route) },
+                onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
+                onNavigateToPetRegistration = { navController.navigate(Screen.PetRegistration.route) }
             )
         }
- // Pantalla de login del vet
+
+        // Login veterinario
         composable(Screen.VetLogin.route) {
             VetLoginScreen(
                 viewModel = vetLoginViewModel,
                 onNavigateBack = { navController.popBackStack() },
-                onNavigateToVetRegister = {
-                    navController.navigate(Screen.VetRegister.route)
-                }
+                onNavigateToVetRegister = { navController.navigate(Screen.VetRegister.route) }
             )
-
         }
-        //
+
+        // Registro veterinario
         composable(Screen.VetRegister.route) {
             VetRegisterScreen(
                 viewModel = vetRegisterViewModel,
@@ -175,47 +124,32 @@ fun NavGraph(
                     }
                 }
             )
+        }
 
-
-    }
-
-        // Pantalla de registro de mascota
+        // Registro de mascotas
         composable(Screen.PetRegistration.route) {
             PetRegistrationScreen(
                 onNavigateToEmergency = {
                     navController.navigate(Screen.Emergency.route) {
-                        // Limpiar el stack para que Emergency =(
                         popUpTo(Screen.PetRegistration.route) { inclusive = true }
                     }
                 },
                 onPetTypeSelected = { petType ->
-                    val petTypeString = when (petType) {
-                        PetType.DOG -> "DOG"
-                        PetType.CAT -> "CAT"
-                        PetType.OTHER -> "OTHER"
-                    }
+                    val petTypeString = petType.name
                     navController.navigate(Screen.PetDetailRegistration.createRoute(petTypeString))
                 }
             )
         }
 
-        // Pantalla de registro detallado de mascota
+        // Registro detallado
         composable(Screen.PetDetailRegistration.route) { backStackEntry ->
             val petTypeString = backStackEntry.arguments?.getString("petType") ?: "DOG"
-            val petType = when (petTypeString) {
-                "DOG" -> PetType.DOG
-                "CAT" -> PetType.CAT
-                "OTHER" -> PetType.OTHER
-                else -> PetType.DOG
-            }
+            val petType = PetType.valueOf(petTypeString)
 
             PetDetailRegistrationScreen(
                 petType = petType,
-                onNavigateBack = {
-                    navController.popBackStack()
-                },
-                onSavePet = { petDetails ->
-                    // aqui se  Guardan los datos de la mascota
+                onNavigateBack = { navController.popBackStack() },
+                onSavePet = {
                     navController.navigate(Screen.Emergency.route) {
                         popUpTo(Screen.PetRegistration.route) { inclusive = true }
                     }
@@ -223,40 +157,17 @@ fun NavGraph(
             )
         }
 
-        // Pantalla de emergencia (pantalla principal con bottom navigation)
+        // Emergencia
         composable(Screen.Emergency.route) {
             EmergencyScreen(
-                onNavigateToAppointments = {
-                    navController.navigate(Screen.Appointments.route)
-                },
-                onNavigateToStore = {
-                    navController.navigate(Screen.Store.route)
-                },
-                onNavigateToSettings = {
-                    navController.navigate(Screen.Settings.route)
-                },
-                onCallEmergency = {
-                    // TODO: Implementar funcionalidad de llamada de emergencia
-                }
+                onNavigateToAppointments = { navController.navigate(Screen.Appointments.route) },
+                onNavigateToStore = { navController.navigate(Screen.Store.route) },
+                onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
+                onCallEmergency = { /* Implementar llamada */ }
             )
         }
 
-        // Pantalla de calendario
-        composable(Screen.Calendar.route) {
-            CalendarScreen(
-                onNavigateBack = {
-                    navController.popBackStack()
-                },
-                onConfirmAppointment = { date, time ->
-                    // TODO: Guardar la cita
-                    navController.navigate(Screen.Emergency.route) {
-                        popUpTo(Screen.Calendar.route) { inclusive = true }
-                    }
-                }
-            )
-        }
-
-        // Pantalla de citas (navega al calendario)
+        // Citas
         composable(Screen.Appointments.route) {
             CalendarScreen(
                 onNavigateBack = {
@@ -264,8 +175,7 @@ fun NavGraph(
                         popUpTo(Screen.Emergency.route) { inclusive = true }
                     }
                 },
-                onConfirmAppointment = { date, time ->
-                    // TODO: Guardar la cita
+                onConfirmAppointment = { _, _ ->
                     navController.navigate(Screen.Emergency.route) {
                         popUpTo(Screen.Appointments.route) { inclusive = true }
                     }
@@ -273,66 +183,46 @@ fun NavGraph(
             )
         }
 
-        // Pantalla de tienda
+        // Tienda
         composable(Screen.Store.route) {
             StoreScreen(
-                onNavigateToAppointments = {
-                    navController.navigate(Screen.Appointments.route)
-                },
-                onNavigateToEmergency = {
-                    navController.navigate(Screen.Emergency.route)
-                },
-                onNavigateToSettings = {
-                    navController.navigate(Screen.Settings.route)
-                },
+                onNavigateToAppointments = { navController.navigate(Screen.Appointments.route) },
+                onNavigateToEmergency = { navController.navigate(Screen.Emergency.route) },
+                onNavigateToSettings = { navController.navigate(Screen.Settings.route) },
                 onNavigateToProductDetail = { productId ->
                     navController.navigate(Screen.ProductDetail.createRoute(productId))
                 },
-                onNavigateToCart = {
-                    navController.navigate(Screen.Cart.route)
-                }
+                onNavigateToCart = { navController.navigate(Screen.Cart.route) }
             )
         }
 
-        // Pantalla de detalle del producto
+        // Detalle producto
         composable(Screen.ProductDetail.route) { backStackEntry ->
             val productId = backStackEntry.arguments?.getString("productId") ?: ""
             ProductDetailScreen(
                 productId = productId,
-                onNavigateBack = {
-                    navController.popBackStack()
-                },
-                onAddToCart = { productId ->
-                    //  Agregar producto al carrito
-                    navController.navigate(Screen.Cart.route)
-                }
+                onNavigateBack = { navController.popBackStack() },
+                onAddToCart = { navController.navigate(Screen.Cart.route) }
             )
         }
 
-        // Pantalla del carrito
+        // Carrito
         composable(Screen.Cart.route) {
             CartScreen(
-                onNavigateBack = {
-                    navController.popBackStack()
-                },
+                onNavigateBack = { navController.popBackStack() },
                 onCheckout = { totalAmount ->
                     navController.navigate(Screen.Payment.createRoute(totalAmount))
                 }
             )
         }
 
-        // Pantalla de pago
+        // Pago
         composable(Screen.Payment.route) { backStackEntry ->
-            val totalAmountString = backStackEntry.arguments?.getString("totalAmount") ?: "0.0"
-            val totalAmount = totalAmountString.toDoubleOrNull() ?: 0.0
+            val totalAmount = backStackEntry.arguments?.getString("totalAmount")?.toDoubleOrNull() ?: 0.0
             PaymentScreen(
                 totalAmount = totalAmount,
-                onNavigateBack = {
-                    navController.popBackStack()
-                },
-                onProcessPayment = { paymentData ->
-                    // TODO: Implementar procesamiento de pago
-                    // navegar de vuelta a la tienda con confirmación
+                onNavigateBack = { navController.popBackStack() },
+                onProcessPayment = {
                     navController.navigate(Screen.Store.route) {
                         popUpTo(Screen.Store.route) { inclusive = true }
                     }
@@ -340,29 +230,16 @@ fun NavGraph(
             )
         }
 
-        // Pantalla de ajustes
+        // Ajustes
         composable(Screen.Settings.route) {
             SettingsScreen(
-                onNavigateToAppointments = {
-                    navController.navigate(Screen.Appointments.route)
-                },
-                onNavigateToEmergency = {
-                    navController.navigate(Screen.Emergency.route)
-                },
-                onNavigateToStore = {
-                    navController.navigate(Screen.Store.route)
-                },
-                onNavigateToFAQ = {
-                    navController.navigate(Screen.FAQ.route)
-                },
-                onNavigateToTerms = {
-                    navController.navigate(Screen.TermsAndConditions.route)
-                },
-                onNavigateToReportProblem = {
-                    navController.navigate(Screen.ReportProblem.route)
-                },
+                onNavigateToAppointments = { navController.navigate(Screen.Appointments.route) },
+                onNavigateToEmergency = { navController.navigate(Screen.Emergency.route) },
+                onNavigateToStore = { navController.navigate(Screen.Store.route) },
+                onNavigateToFAQ = { navController.navigate(Screen.FAQ.route) },
+                onNavigateToTerms = { navController.navigate(Screen.TermsAndConditions.route) },
+                onNavigateToReportProblem = { navController.navigate(Screen.ReportProblem.route) },
                 onLogout = {
-                    // TODO: Implementar lógica de cerrar sesión
                     navController.navigate(Screen.Login.route) {
                         popUpTo(0) { inclusive = true }
                     }
@@ -370,71 +247,22 @@ fun NavGraph(
             )
         }
 
-        // Pantalla de preguntas frecuentes
+        // FAQ
         composable(Screen.FAQ.route) {
-            FAQScreen(
-                onNavigateBack = {
-                    navController.popBackStack()
-                }
-            )
+            FAQScreen(onNavigateBack = { navController.popBackStack() })
         }
 
-        // Pantalla de términos y condiciones
+        // Términos
         composable(Screen.TermsAndConditions.route) {
-            TermsAndConditionsScreen(
-                onNavigateBack = {
-                    navController.popBackStack()
-                }
-            )
+            TermsAndConditionsScreen(onNavigateBack = { navController.popBackStack() })
         }
 
-        // Pantalla de reportar problema
+        // Reporte problema
         composable(Screen.ReportProblem.route) {
             ReportProblemScreen(
-                onNavigateBack = {
-                    navController.popBackStack()
-                },
-                onReportProblem = { selectedProblems, otherProblem ->
-                    // TODO: Implementar lógica para enviar el reporte
-                    navController.popBackStack()
-                }
+                onNavigateBack = { navController.popBackStack() },
+                onReportProblem = { _, _ -> navController.popBackStack() }
             )
-        }
-    }
-}
-
-/*  pantallas que aun no estan implementadas */
-@Composable
-private fun PlaceholderScreen(
-    title: String,
-    onNavigateBack: () -> Unit
-) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = title,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            Text(
-                text = "Pantalla en desarrollo",
-                fontSize = 16.sp,
-                color = Color.Gray
-            )
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            Button(onClick = onNavigateBack) {
-                Text("Regresar")
-            }
         }
     }
 }

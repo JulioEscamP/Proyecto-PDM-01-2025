@@ -1,18 +1,17 @@
 package com.jejhdmdv.proyecto_pdm.model.login
 
 data class RegisterRequest(
+    val nombre: String,
+    val edad: String,
+    val dui: String,
     val email: String,
+    val telefono: String,
+    val direccion: String,
     val password: String,
-    val username: String,
     val passwordConfirmation: String
 )
 
 data class RegisterResponse(
-<<<<<<< Updated upstream
-    val userId: String,
-    val accessToken: String, // Token del RetrofitClient
-    val username: String?
-=======
     val message: String,
     val userId: String?
 )
@@ -23,9 +22,7 @@ data class VetRegisterRequest(
     val telefono: String,
     val direccion: String,
     val password: String,
-    val passwordConfirmation: String,
-
->>>>>>> Stashed changes
+    val passwordConfirmation: String
 )
 
 data class GoogleSignInRequest(

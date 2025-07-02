@@ -69,12 +69,11 @@ fun VetRegisterScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 32.dp)
-                .verticalScroll(rememberScrollState()), // Scroll activado
+                .verticalScroll(rememberScrollState()),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(32.dp))
 
-            // ✅ Logo ahora se mueve con el scroll
             Image(
                 painter = painterResource(id = R.drawable.dog_icon),
                 contentDescription = "Icono",
@@ -174,7 +173,7 @@ fun VetRegisterScreen(
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            // ✅ Botón de regresar (negro, igual diseño que el otro)
+
             Button(
                 onClick = onNavigateBack,
                 modifier = Modifier

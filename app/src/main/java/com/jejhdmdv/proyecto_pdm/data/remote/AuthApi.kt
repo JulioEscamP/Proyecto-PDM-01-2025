@@ -5,10 +5,7 @@ import com.jejhdmdv.proyecto_pdm.model.login.LoginRequest
 import com.jejhdmdv.proyecto_pdm.model.login.LoginResponse
 import com.jejhdmdv.proyecto_pdm.model.login.RegisterRequest
 import com.jejhdmdv.proyecto_pdm.model.login.RegisterResponse
-<<<<<<< Updated upstream
-=======
 import com. jejhdmdv. proyecto_pdm. model. login. VetRegisterRequest
->>>>>>> Stashed changes
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST
