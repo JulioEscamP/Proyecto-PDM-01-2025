@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.jejhdmdv.proyecto_pdm.ui.viewmodels.calendarioviewmodel.CalendarUiState
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.TextStyle
@@ -55,20 +56,17 @@ import java.util.Locale
 
 @Composable
 fun CalendarScreen(
-    onNavigateBack: () -> Unit = {},
-
-    onConfirmAppointment: (LocalDate, String) -> Unit = { _, _ -> },
-    modifier: Modifier = Modifier,
-    // Lista de fechas no disponibles, para ser proporcionada dinámicamente
-    unavailableDates: List<LocalDate> = emptyList()
-
+    uiState: CalendarUiState, // Recibe el estado completo
+    onNavigateBack: () -> Unit,
+    onMonthChange: (YearMonth) -> Unit,
+    onDateSelected: (LocalDate) -> Unit,
+    onTimeSelected: (String) -> Unit,
+    onConfirmAppointment: () -> Unit,
+    unavailableDates: List<LocalDate>,
+    availableTimeSlots: List<String>,
+    modifier: Modifier = Modifier
 ) {
-    // Estados para el calendario y selección
-    var currentMonth by remember { mutableStateOf(YearMonth.now()) }
-    var selectedDate by remember { mutableStateOf<LocalDate?>(null) }
-    var selectedTime by remember { mutableStateOf<String?>(null) }
 
-    // Fondo
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -95,15 +93,10 @@ fun CalendarScreen(
 
             // Sección del calendario
             CalendarSection(
-                currentMonth = currentMonth,
-                selectedDate = selectedDate,
-                onMonthChange = { currentMonth = it },
-                onDateSelected = { date ->
-                    // Solo permite seleccionar fechas disponibles
-                    if (date !in unavailableDates) {
-                        selectedDate = date
-                    }
-                },
+                currentMonth = uiState.currentMonth,
+                selectedDate = uiState.selectedDate,
+                onMonthChange = onMonthChange,
+                onDateSelected = onDateSelected,
                 unavailableDates = unavailableDates
             )
 
@@ -111,22 +104,17 @@ fun CalendarScreen(
 
             // Sección de selección de hora
             TimeSelectionSection(
-                selectedTime = selectedTime,
-                onTimeSelected = { selectedTime = it }
+                selectedTime = uiState.selectedTime,
+                onTimeSelected = onTimeSelected,
+                timeSlots = availableTimeSlots
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
             // Botón confirmar
             ConfirmButton(
-                isEnabled = selectedDate != null && selectedTime != null && selectedDate !in unavailableDates,
-                onClick = {
-                    selectedDate?.let { date ->
-                        selectedTime?.let { time ->
-                            onConfirmAppointment(date, time)
-                        }
-                    }
-                }
+                isEnabled = uiState.selectedDate != null && uiState.selectedTime != null,
+                onClick = onConfirmAppointment
             )
 
             Spacer(modifier = Modifier.weight(1f))
@@ -221,7 +209,6 @@ private fun CalendarGrid(
     val firstDayOfWeek = firstDayOfMonth.dayOfWeek.value % 7
     val daysInMonth = currentMonth.lengthOfMonth()
 
-    // Crear lista de días para mostrar
     val days = mutableListOf<LocalDate?>()
 
     // Días vacíos al inicio
@@ -298,7 +285,8 @@ private fun CalendarDay(
 @Composable
 private fun TimeSelectionSection(
     selectedTime: String?,
-    onTimeSelected: (String) -> Unit
+    onTimeSelected: (String) -> Unit,
+    timeSlots: List<String>
 ) {
     Column {
         Text(
@@ -392,19 +380,4 @@ private fun ConfirmButton(
             fontWeight = FontWeight.Bold
         )
     }
-}
-
-/**
- * Preview de la pantalla de calendario
- */
-@Preview(showBackground = true, showSystemUi = true)
-@Composable
-fun CalendarScreenPreview() {
-    // Ejemplo de fechas no disponibles
-    val unavailableDates = listOf(
-        LocalDate.now().plusDays(2),
-        LocalDate.now().plusDays(5),
-        LocalDate.now().withDayOfMonth(10)
-    )
-    CalendarScreen(unavailableDates = unavailableDates)
 }

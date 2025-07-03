@@ -14,6 +14,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -22,6 +23,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -50,6 +52,9 @@ import com.jejhdmdv. proyecto_pdm. ui. viewmodels. vetloginviewmodel.VetLoginVie
 import com.jejhdmdv.proyecto_pdm.ui.viewmodels. vetregisterviewmodel.VetRegisterViewModel
 import com.jejhdmdv.proyecto_pdm.ui.screens.VetLoginScreen
 import com.jejhdmdv.proyecto_pdm.ui.screens.VetRegisterScreen
+import com.jejhdmdv.proyecto_pdm.ui.viewmodels.calendarioviewmodel.ReminderViewModel
+import java.time.Instant
+import java.time.ZoneId
 
 /**
  * Composable que define el grafo de navegación de la aplicación
@@ -259,35 +264,100 @@ fun NavGraph(
 
         // Pantalla de calendario
         composable(Screen.Calendar.route) {
-            CalendarScreen(
-                onNavigateBack = {
+
+            val viewModel: ReminderViewModel = viewModel()
+            val context = LocalContext.current
+
+            LaunchedEffect(Unit) {
+                val account = GoogleSignIn.getLastSignedInAccount(context)
+                if (account != null) {
+                    viewModel.initialize(account, context)
+                } else {
+                    Toast.makeText(context, "Error: Usuario no autenticado.", Toast.LENGTH_LONG).show()
                     navController.popBackStack()
-                },
-                onConfirmAppointment = { date, time ->
-                    // TODO: Guardar la cita
-                    navController.navigate(Screen.Emergency.route) {
-                        popUpTo(Screen.Calendar.route) { inclusive = true }
-                    }
                 }
+            }
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+            LaunchedEffect(uiState.appointmentResult) {
+                when(val result = uiState.appointmentResult) {
+                    is Resource.Success -> {
+                        Toast.makeText(context, "Cita confirmada exitosamente!", Toast.LENGTH_SHORT).show()
+                        viewModel.resetAppointmentResult()
+                        navController.navigate(Screen.Emergency.route) {
+                            popUpTo(Screen.Calendar.route) { inclusive = true }
+                        }
+                    }
+                    is Resource.Error -> {
+                        Toast.makeText(context, result.message, Toast.LENGTH_LONG).show()
+                        viewModel.resetAppointmentResult()
+                    }
+                    else -> {} // No hacer nada en Loading
+                }
+            }
+
+            val unavailableDates = remember(uiState.eventsForMonth) {
+                uiState.eventsForMonth.mapNotNull { event ->
+                    val eventDate = event.start?.dateTime?.value
+                    if (eventDate != null) {
+                        Instant.ofEpochMilli(eventDate).atZone(ZoneId.systemDefault()).toLocalDate()
+                    } else null
+                }.distinct()
+            }
+
+            val availableTimeSlots = remember(uiState.selectedDate, uiState.eventsForMonth) {
+                val baseSlots = listOf("09:00", "10:00", "11:00", "14:00", "15:00", "16:00")
+                val selectedDate = uiState.selectedDate
+                if (selectedDate == null) {
+                    baseSlots
+                } else {
+                    val occupiedSlots = uiState.eventsForMonth.mapNotNull { event ->
+                        val eventStart = event.start?.dateTime?.value
+                        if (eventStart != null) {
+                            val eventDateTime = Instant.ofEpochMilli(eventStart).atZone(ZoneId.systemDefault())
+                            if (eventDateTime.toLocalDate() == selectedDate) {
+                                String.format("%02d:%02d", eventDateTime.hour, eventDateTime.minute)
+                            } else null
+                        } else null
+                    }
+                    baseSlots.filter { it !in occupiedSlots }
+                }
+            }
+
+            // Llama a tu CalendarScreen y conecta todo
+            CalendarScreen(
+                uiState = uiState,
+                onNavigateBack = { navController.popBackStack() },
+                onMonthChange = { viewModel.onMonthChange(it) },
+                onDateSelected = { viewModel.onDateSelected(it) },
+                onTimeSelected = { viewModel.onTimeSelected(it) },
+                onConfirmAppointment = { viewModel.confirmAppointment() },
+                unavailableDates = unavailableDates,
+                availableTimeSlots = availableTimeSlots
             )
         }
 
-        // Pantalla de citas (navega al calendario)
+        // TODO: Pantalla de citas (navega al calendario)
+
+        /*
         composable(Screen.Appointments.route) {
             CalendarScreen(
+
                 onNavigateBack = {
                     navController.navigate(Screen.Emergency.route) {
                         popUpTo(Screen.Emergency.route) { inclusive = true }
                     }
-                },
+                }
+
                 onConfirmAppointment = { date, time ->
-                    // TODO: Guardar la cita
                     navController.navigate(Screen.Emergency.route) {
                         popUpTo(Screen.Appointments.route) { inclusive = true }
                     }
                 }
             )
         }
+
+         */
 
         // Pantalla de tienda
         composable(Screen.Store.route) {

@@ -2,6 +2,7 @@ package com.jejhdmdv.proyecto_pdm.ui.viewmodels.calendarioviewmodel
 
 import com.google.api.services.calendar.model.Event
 import androidx.compose.runtime.*
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount
 import com.google.api.client.googleapis.extensions.android.gms.auth.GoogleAccountCredential
@@ -39,7 +40,7 @@ data class CalendarUiState(
     val appointmentResult: Resource<Event> = Resource.Idle()
 )
 
-class ReminderViewModel : androidx.lifecycle.ViewModel() {
+class ReminderViewModel : ViewModel() {
 
     private var calendarService: Calendar? = null
 
