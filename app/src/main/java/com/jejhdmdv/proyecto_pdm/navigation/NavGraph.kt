@@ -1,6 +1,7 @@
 package com.jejhdmdv.proyecto_pdm.navigation
 
 import android.app.Activity
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -30,6 +31,8 @@ import androidx.navigation.compose.composable
 import com.google.android.gms.auth.api.signin.GoogleSignIn
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.common.api.Scope
+import com.google.api.services.calendar.CalendarScopes
 import com.jejhdmdv.proyecto_pdm.ui.screens.EmergencyScreen
 import com.jejhdmdv.proyecto_pdm.ui.screens.HomeScreen
 import com.jejhdmdv.proyecto_pdm.ui.screens.LoginScreen
@@ -78,26 +81,32 @@ fun NavGraph(
             val loginViewModel: LoginViewModel = loginViewModel
             // El contexto para google sign-In
             val context = LocalContext.current
+            val TAG = "GoogleSignInDebug"
 
             // Logica del launcher para recibir el resultado de Google
             val launcher = rememberLauncherForActivityResult(
                 contract = ActivityResultContracts.StartActivityForResult()
             ) { result ->
+                Log.d(TAG, "Resultado recibido. Código de resultado: ${result.resultCode}")
                 if (result.resultCode == Activity.RESULT_OK) {
                     val task = GoogleSignIn.getSignedInAccountFromIntent(result.data)
                     try {
                         val account = task.getResult(ApiException::class.java)!!
                         val idToken = account.idToken
+                        Log.d(TAG, "¡Inicio de sesión con Google exitoso! Email: ${account.email}")
                         if (idToken != null) {
+                            Log.d(TAG, "idToken obtenido, llamando al ViewModel.")
                             loginViewModel.signInWithGoogle(idToken)
                         } else {
-                            // Manejar el caso de token nulo
-                            Toast.makeText(context, "Error: idToken de Google es nulo.", Toast.LENGTH_SHORT).show()
+                            Log.e(TAG, "Error: idToken de Google es nulo.")
+                            Toast.makeText(context, "Error: No se pudo obtener el idToken de Google.", Toast.LENGTH_LONG).show()
                         }
                     } catch (e: ApiException) {
-                        // Manejar error de la API
-                        Toast.makeText(context, "Error de Google Sign-In: ${e.statusCode}", Toast.LENGTH_SHORT).show()
+                        Log.e(TAG, "Error de Google Sign-In. Código de estado: ${e.statusCode}", e)
+                        Toast.makeText(context, "Error al iniciar sesión con Google: ${e.statusCode}", Toast.LENGTH_LONG).show()
                     }
+                } else {
+                    Log.w(TAG, "El inicio de sesión fue cancelado o falló. Código: ${result.resultCode}")
                 }
             }
 
@@ -122,7 +131,8 @@ fun NavGraph(
                 onGoogleSignInClick = {
                     val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                         .requestEmail()
-                        .requestIdToken("75282745771-197vm5m67kuec92bj5o22ju2bf2ap4kl.apps.googleusercontent.com")
+                        .requestIdToken("75282745771-2saic2io65g1d93fdlaqj6q3d7lqqe3c.apps.googleusercontent.com")
+                        .requestScopes(Scope(CalendarScopes.CALENDAR))
                         .build()
                     val googleSignInClient = GoogleSignIn.getClient(context, gso)
 
