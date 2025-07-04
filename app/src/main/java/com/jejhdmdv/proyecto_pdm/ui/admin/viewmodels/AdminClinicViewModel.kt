@@ -64,6 +64,10 @@ class AdminClinicViewModel(
                     is Resource.Loading -> {
                         _operationState.value = Resource.Loading()
                     }
+                    else -> {
+                        // Handle Idle or any other unhandled state
+                        _operationState.value = Resource.Idle()
+                    }
                 }
             }
         }
@@ -84,6 +88,10 @@ class AdminClinicViewModel(
                     is Resource.Loading -> {
                         _operationState.value = Resource.Loading()
                     }
+                    else -> {
+                        // Handle Idle or any other unhandled state
+                        _operationState.value = Resource.Idle()
+                    }
                 }
             }
         }
@@ -103,6 +111,10 @@ class AdminClinicViewModel(
                     }
                     is Resource.Loading -> {
                         _operationState.value = Resource.Loading()
+                    }
+                    else -> {
+                        // Handle Idle or any other unhandled state
+                        _operationState.value = Resource.Idle()
                     }
                 }
             }
