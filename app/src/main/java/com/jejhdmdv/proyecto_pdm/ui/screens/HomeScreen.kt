@@ -1,5 +1,6 @@
 package com.jejhdmdv.proyecto_pdm.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -55,7 +56,8 @@ data class Pet(
     val id: String,
     val name: String,
     val type: String,
-    val imageRes: Int? = null
+    val imageRes: Int? = null,
+    val medicalHistory: List<String> = emptyList()
 )
 
 /**
@@ -125,7 +127,7 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.height(20.dp))
 
                 // Sección de recordatorios y avisos
-                RemindersAndNoticesSection()
+                RemindersAndNoticesSection(onNavigateToAppointments = onNavigateToAppointments)
 
                 Spacer(modifier = Modifier.height(100.dp))
             }
@@ -187,28 +189,33 @@ private fun PetCarouselSection(
     selectedIndex: Int,
     onPetSelected: (Int) -> Unit
 ) {
+    var expanded by remember { mutableStateOf(false) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        ),
+            .height(if (expanded) 300.dp else 200.dp)
+            .clickable { expanded = !expanded },
+        colors = CardDefaults.cardColors(containerColor = Color.White),
         shape = RoundedCornerShape(12.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
-        Box(
-            modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
+        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.TopCenter) {
             if (pets.isNotEmpty()) {
                 val currentPet = pets[selectedIndex]
 
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    // Imagen de la mascota (placeholder)
-                    Box(
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    currentPet.imageRes?.let { imageResId ->
+                        Image(
+                            painter = painterResource(id = imageResId),
+                            contentDescription = "Foto de ${currentPet.name}",
+                            modifier = Modifier
+                                .size(100.dp)
+                                .clip(RoundedCornerShape(12.dp))
+                        )
+                    } ?: Box(
                         modifier = Modifier
                             .size(100.dp)
                             .clip(RoundedCornerShape(12.dp))
@@ -216,12 +223,13 @@ private fun PetCarouselSection(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "Foto de\n${currentPet.name}",
+                            text = "Sin foto",
                             color = Color.Gray,
                             fontSize = 12.sp,
                             textAlign = TextAlign.Center
                         )
                     }
+
 
                     Spacer(modifier = Modifier.height(12.dp))
 
@@ -237,39 +245,54 @@ private fun PetCarouselSection(
                         fontSize = 14.sp,
                         color = Color.Gray
                     )
+
+                    // Historial médico
+                    if (expanded && currentPet.medicalHistory.isNotEmpty()) {
+                        Spacer(modifier = Modifier.height(12.dp))
+                        Column(
+                            modifier = Modifier.padding(horizontal = 16.dp),
+                            horizontalAlignment = Alignment.Start
+                        ) {
+                            Text(
+                                text = "Historial Médico:",
+                                fontWeight = FontWeight.SemiBold,
+                                fontSize = 14.sp,
+                                color = Color.Black
+                            )
+                            currentPet.medicalHistory.forEach { record ->
+                                Text(
+                                    text = "• $record",
+                                    fontSize = 13.sp,
+                                    color = Color.DarkGray,
+                                    modifier = Modifier.padding(top = 4.dp)
+                                )
+                            }
+                        }
+                    }
                 }
 
-                // Controles de navegación del carrusel
                 if (pets.size > 1) {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 12.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        IconButton(
-                            onClick = {
-                                val newIndex = if (selectedIndex > 0) selectedIndex - 1 else pets.size - 1
-                                onPetSelected(newIndex)
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowBack,
-                                contentDescription = "Mascota anterior",
-                                tint = Color.Gray
-                            )
+                        IconButton(onClick = {
+                            val newIndex = if (selectedIndex > 0) selectedIndex - 1 else pets.size - 1
+                            onPetSelected(newIndex)
+                            expanded = false
+                        }) {
+                            Icon(Icons.Default.ArrowBack, contentDescription = "Anterior", tint = Color.Gray)
                         }
 
-                        IconButton(
-                            onClick = {
-                                val newIndex = if (selectedIndex < pets.size - 1) selectedIndex + 1 else 0
-                                onPetSelected(newIndex)
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.ArrowForward,
-                                contentDescription = "Siguiente mascota",
-                                tint = Color.Gray
-                            )
+                        IconButton(onClick = {
+                            val newIndex = if (selectedIndex < pets.size - 1) selectedIndex + 1 else 0
+                            onPetSelected(newIndex)
+                            expanded = false
+                        }) {
+                            Icon(Icons.Default.ArrowForward, contentDescription = "Siguiente", tint = Color.Gray)
                         }
                     }
                 }
@@ -286,7 +309,9 @@ private fun PetCarouselSection(
 }
 
 
-  //Botón para registrar nueva mascota
+
+
+//Botón para registrar nueva mascota
 
 @Composable
 private fun RegisterPetButton(
@@ -310,10 +335,12 @@ private fun RegisterPetButton(
 }
 
 
- //Sección de recordatorios y avisos
+//Sección de recordatorios y avisos
 
 @Composable
-private fun RemindersAndNoticesSection() {
+private fun RemindersAndNoticesSection(
+    onNavigateToAppointments: () -> Unit
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -323,7 +350,10 @@ private fun RemindersAndNoticesSection() {
             modifier = Modifier
                 .weight(1f)
                 .height(150.dp)
-                .clickable {  },
+                .clickable {
+                    Log.d("HomeScreenDebug", "Card de Recordatorios fue presionada.")
+                    onNavigateToAppointments()
+                },
             colors = CardDefaults.cardColors(
                 containerColor = Color.White
             ),
@@ -375,11 +405,31 @@ private fun RemindersAndNoticesSection() {
 //funcion solo genera mascotas de muestra
 private fun samplePets(): List<Pet> {
     return listOf(
-        Pet("1", "Max", "Perro", null),
-        Pet("2", "Luna", "Gato", null),
-        Pet("3", "Rocky", "Perro", null)
+        Pet(
+            "1", "Max", "Perro", R.drawable.max,
+            listOf(
+                "12/01/2024 - Vacuna antirrábica aplicada",
+                "20/03/2024 - Desparasitación oral",
+                "10/05/2024 - Revisión general, todo en orden"
+            )
+        ),
+        Pet(
+            "2", "Luna", "Gato", R.drawable.luna,
+            listOf(
+                "05/02/2024 - Esterilización",
+                "18/04/2024 - Infección leve tratada con antibióticos"
+            )
+        ),
+        Pet(
+            "3", "Rocky", "Perro", R.drawable.rocky,
+            listOf(
+                "01/01/2024 - Control de pulgas",
+                "10/06/2024 - Limpieza dental"
+            )
+        )
     )
 }
+
 
 
 @Preview(showBackground = true, showSystemUi = true)
@@ -387,4 +437,3 @@ private fun samplePets(): List<Pet> {
 fun HomeScreenPreview() {
     HomeScreen()
 }
-
