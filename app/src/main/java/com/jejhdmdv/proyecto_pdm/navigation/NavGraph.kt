@@ -199,6 +199,37 @@ fun NavGraph(
         }
  // Pantalla de login del vet
         composable(Screen.VetLogin.route) {
+
+            val loginResult by vetLoginViewModel.loginResult.collectAsStateWithLifecycle()
+            val context = LocalContext.current // Get the current context for Toast messages
+
+
+            LaunchedEffect(loginResult) {
+                when (loginResult) {
+                    is Resource.Success -> {
+                        Toast.makeText(context, "Inicio de sesión de veterinario exitoso!", Toast.LENGTH_SHORT).show()
+
+                        navController.navigate(Screen.AdminHome.route) {
+                            popUpTo(Screen.VetLogin.route) { inclusive = true }
+                        }
+
+                        vetLoginViewModel.resetLoginResult()
+                    }
+                    is Resource.Error -> {
+                        val errorMessage = (loginResult as Resource.Error).message ?: "Error desconocido al iniciar sesión."
+                        Toast.makeText(context, "Error: $errorMessage", Toast.LENGTH_LONG).show()
+                        vetLoginViewModel.resetLoginResult() // <--- ADD THIS FUNCTION TO VETLOGINVIEWMODEL
+                    }
+                    is Resource.Loading -> { //
+
+                    }
+                    is Resource.Idle -> {
+
+                    }
+                }
+            }
+
+            // Your VetLoginScreen Composable
             VetLoginScreen(
                 viewModel = vetLoginViewModel,
                 onNavigateBack = { navController.popBackStack() },
@@ -206,7 +237,6 @@ fun NavGraph(
                     navController.navigate(Screen.VetRegister.route)
                 }
             )
-
         }
         //
         composable(Screen.VetRegister.route) {
