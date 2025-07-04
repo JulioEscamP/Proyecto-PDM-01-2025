@@ -38,6 +38,24 @@ sealed class Screen(val route: String) {
     object FAQ : Screen("faq")
     object TermsAndConditions : Screen("terms_and_conditions")
     object ReportProblem : Screen("report_problem")
+    // Pantallas de administrador
+    object AdminHome : Screen("admin_home")
+    object AdminProfile : Screen("admin_profile")
+
+    // Gestión de productos (Admin)
+    object AdminProductList : Screen("admin_product_list")
+    object AdminProductForm : Screen("admin_product_form/{productId}") {
+        fun createRoute(productId: String = "new") = "admin_product_form/$productId"
+    }
+
+    // Gestión de clínicas (Admin)
+    object AdminClinicList : Screen("admin_clinic_list")
+    object AdminClinicForm : Screen("admin_clinic_form/{clinicId}") {
+        fun createRoute(clinicId: String = "new") = "admin_clinic_form/$clinicId"
+    }
+
+    // Gestión de citas (Admin)
+    object AdminAppointmentList : Screen("admin_appointment_list")
 }
 
 

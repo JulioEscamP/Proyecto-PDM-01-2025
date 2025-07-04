@@ -49,6 +49,10 @@ import com.jejhdmdv.proyecto_pdm.ui.screens.StoreScreen
 import com.jejhdmdv.proyecto_pdm.ui.screens.ProductDetailScreen
 import com.jejhdmdv.proyecto_pdm.ui.screens.CartScreen
 import com.jejhdmdv.proyecto_pdm.ui.screens.PaymentScreen
+import com.jejhdmdv.proyecto_pdm.ui.screens.VetLoginScreen
+import com.jejhdmdv.proyecto_pdm.ui.screens.VetRegisterScreen
+import com.jejhdmdv.proyecto_pdm.ui.admin.screens.AdminHomeScreen
+import com.jejhdmdv.proyecto_pdm.ui.admin.screens.AdminProfileScreen
 import com.jejhdmdv.proyecto_pdm.ui.viewmodels.loginviewmodel.LoginViewModel
 import com.jejhdmdv.proyecto_pdm.utils.Resource
 import com.jejhdmdv. proyecto_pdm. ui. viewmodels. vetloginviewmodel.VetLoginViewModel
@@ -58,6 +62,7 @@ import com.jejhdmdv.proyecto_pdm.ui.screens.VetRegisterScreen
 import com.jejhdmdv.proyecto_pdm.ui.viewmodels.calendarioviewmodel.ReminderViewModel
 import java.time.Instant
 import java.time.ZoneId
+
 
 /**
  * Composable que define el grafo de navegación de la aplicación
@@ -75,7 +80,7 @@ fun NavGraph(
         navController = navController,
         startDestination = Screen.Login.route
     ) {
-        // Pantalla de inicio de sesión
+        // --- PANTALLA DE LOGIN ---
         composable(Screen.Login.route) {
 
             val loginViewModel: LoginViewModel = loginViewModel
@@ -114,9 +119,18 @@ fun NavGraph(
             val loginResult by loginViewModel.loginResult.collectAsStateWithLifecycle()
             LaunchedEffect(loginResult) {
                 if (loginResult is Resource.Success) {
-                    // Navega a la pantalla principal y limpia la pila de navegación
-                    navController.navigate(Screen.Home.route) {
-                        popUpTo(Screen.Login.route) { inclusive = true }
+                    // TODO: Verificar si el usuario es administrador basado en la respuesta del backend
+                    // Por ahora, usaremos una lógica simple: si el usuario es un administrador, se asume que su nombre de usuario contiene "admin"
+                    val isAdmin = loginResult.data?.username?.contains("admin") == true
+
+                    if (isAdmin) {
+                        navController.navigate(Screen.AdminHome.route) {
+                            popUpTo(Screen.Login.route) { inclusive = true }
+                        }
+                    } else {
+                        navController.navigate(Screen.Home.route) {
+                            popUpTo(Screen.Login.route) { inclusive = true }
+                        }
                     }
                 }
             }
@@ -127,7 +141,6 @@ fun NavGraph(
                 onNavigateToRegister = {
                     navController.navigate(Screen.Register.route)
                 },
-
                 onGoogleSignInClick = {
                     val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                         .requestEmail()
@@ -347,9 +360,7 @@ fun NavGraph(
             )
         }
 
-        // TODO: Pantalla de citas (navega al calendario)
-
-
+        // Pantalla de citas (navega al calendario)
         composable(Screen.Appointments.route) {
 
             val viewModel: ReminderViewModel = viewModel()
@@ -421,8 +432,6 @@ fun NavGraph(
                 onConfirmAppointment = { viewModel.confirmAppointment() }
             )
         }
-
-
 
         // Pantalla de tienda
         composable(Screen.Store.route) {
@@ -551,6 +560,94 @@ fun NavGraph(
                 }
             )
         }
+
+
+
+        // Pantalla principal del administrador
+        composable(Screen.AdminHome.route) {
+            AdminHomeScreen(
+                onNavigateToProducts = {
+                    navController.navigate(Screen.AdminProductList.route)
+                },
+                onNavigateToClinics = {
+                    navController.navigate(Screen.AdminClinicList.route)
+                },
+                onNavigateToAppointments = {
+                    navController.navigate(Screen.AdminAppointmentList.route)
+                },
+                onNavigateToProfile = {
+                    navController.navigate(Screen.AdminProfile.route)
+                },
+                onLogout = {
+                    navController.navigate(Screen.VetLogin.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        // Pantalla de perfil del administrador
+        composable(Screen.AdminProfile.route) {
+            AdminProfileScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onLogout = {
+                    navController.navigate(Screen.VetLogin.route) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                },
+                onSaveProfile = { name, address, phone ->
+                    // TODO: Implementar guardado de perfil
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        // Lista de productos (Admin)
+        composable(Screen.AdminProductList.route) {
+            // TODO: Implementar con ViewModel
+            PlaceholderScreen(
+                title = "Lista de Productos",
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        // Formulario de producto (Admin)
+        composable(Screen.AdminProductForm.route) { backStackEntry ->
+            val productId = backStackEntry.arguments?.getString("productId") ?: "new"
+            // TODO: Implementar con ViewModel
+            PlaceholderScreen(
+                title = if (productId == "new") "Nuevo Producto" else "Editar Producto",
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        // Lista de clínicas (Admin)
+        composable(Screen.AdminClinicList.route) {
+            PlaceholderScreen(
+                title = "Lista de Clínicas",
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+        // Formulario de clínica (Admin)
+        composable(Screen.AdminClinicForm.route) { backStackEntry ->
+            val clinicId = backStackEntry.arguments?.getString("clinicId") ?: "new"
+            PlaceholderScreen(
+                title = if (clinicId == "new") "Nueva Clínica" else "Editar Clínica",
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
+
+
+        composable(Screen.AdminAppointmentList.route) {
+
+            PlaceholderScreen(
+                title = "Gestión de Citas",
+                onNavigateBack = { navController.popBackStack() }
+            )
+        }
     }
 }
 
@@ -589,4 +686,3 @@ private fun PlaceholderScreen(
         }
     }
 }
-
