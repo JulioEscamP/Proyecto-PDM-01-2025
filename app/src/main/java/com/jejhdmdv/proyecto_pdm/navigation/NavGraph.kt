@@ -349,25 +349,80 @@ fun NavGraph(
 
         // TODO: Pantalla de citas (navega al calendario)
 
-        /*
+
         composable(Screen.Appointments.route) {
+
+            val viewModel: ReminderViewModel = viewModel()
+            val context = LocalContext.current
+
+            LaunchedEffect(Unit) {
+                val account = GoogleSignIn.getLastSignedInAccount(context)
+                if (account != null) {
+                    viewModel.initialize(account, context)
+                } else {
+                    Toast.makeText(context, "Error: Usuario no autenticado.", Toast.LENGTH_LONG).show()
+                    navController.popBackStack()
+                }
+            }
+
+            val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+            val appointmentResult by viewModel.appointmentResult.collectAsStateWithLifecycle()
+
+            LaunchedEffect(appointmentResult) {
+                when(val result = appointmentResult) {
+                    is Resource.Success -> {
+                        Toast.makeText(context, "Cita confirmada exitosamente!", Toast.LENGTH_SHORT).show()
+                        viewModel.resetAppointmentResult() // Resetea para evitar múltiples Toasts/navegaciones
+                        navController.navigate(Screen.Emergency.route) {
+                            popUpTo(Screen.Appointments.route) { inclusive = true }
+                        }
+                    }
+                    is Resource.Error -> {
+                        Toast.makeText(context, result.message, Toast.LENGTH_LONG).show()
+                        viewModel.resetAppointmentResult()
+                    }
+                    else -> {}
+                }
+            }
+
+            val unavailableDates = remember(uiState.eventsForMonth) {
+                uiState.eventsForMonth.mapNotNull { event ->
+                    event.start?.dateTime?.value?.let {
+                        Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault()).toLocalDate()
+                    }
+                }.distinct()
+            }
+
+            val availableTimeSlots = remember(uiState.selectedDate, uiState.eventsForMonth) {
+                val baseSlots = listOf("09:00", "10:00", "11:00", "14:00", "15:00", "16:00")
+                val selectedDate = uiState.selectedDate ?: return@remember emptyList()
+
+                val occupiedSlots = uiState.eventsForMonth.mapNotNull { event ->
+                    event.start?.dateTime?.value?.let {
+                        val eventDateTime = Instant.ofEpochMilli(it).atZone(ZoneId.systemDefault())
+                        if (eventDateTime.toLocalDate() == selectedDate) {
+                            String.format("%02d:%02d", eventDateTime.hour, eventDateTime.minute)
+                        } else null
+                    }
+                }
+                baseSlots.filter { it !in occupiedSlots }
+            }
+
             CalendarScreen(
-
+                uiState = uiState,
+                unavailableDates = unavailableDates,
+                availableTimeSlots = availableTimeSlots,
                 onNavigateBack = {
-                    navController.navigate(Screen.Emergency.route) {
-                        popUpTo(Screen.Emergency.route) { inclusive = true }
-                    }
-                }
-
-                onConfirmAppointment = { date, time ->
-                    navController.navigate(Screen.Emergency.route) {
-                        popUpTo(Screen.Appointments.route) { inclusive = true }
-                    }
-                }
+                    navController.popBackStack()
+                },
+                onMonthChange = { viewModel.onMonthChange(it) },
+                onDateSelected = { viewModel.onDateSelected(it) },
+                onTimeSelected = { viewModel.onTimeSelected(it) },
+                onConfirmAppointment = { viewModel.confirmAppointment() }
             )
         }
 
-         */
+
 
         // Pantalla de tienda
         composable(Screen.Store.route) {

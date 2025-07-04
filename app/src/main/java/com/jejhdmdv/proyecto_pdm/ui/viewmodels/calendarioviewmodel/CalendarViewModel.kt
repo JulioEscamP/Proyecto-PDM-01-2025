@@ -52,6 +52,9 @@ class ReminderViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(CalendarUiState())
     val uiState: StateFlow<CalendarUiState> = _uiState.asStateFlow()
 
+    private val _appointmentResult = MutableStateFlow<Resource<Event>>(Resource.Idle())
+    val appointmentResult: StateFlow<Resource<Event>> = _appointmentResult.asStateFlow()
+
     fun initialize(account: GoogleSignInAccount, context: android.content.Context) {
         if (calendarService != null) return // Evitar reinicializar
 
@@ -152,118 +155,6 @@ class ReminderViewModel : ViewModel() {
     fun resetAppointmentResult() {
         _uiState.update { it.copy(appointmentResult = Resource.Idle()) }
     }
-
-    /*
-
-    // Día seleccionado
-    private val _selectedDate = MutableStateFlow(LocalDate.now())
-    val selectedDate: StateFlow<LocalDate> = _selectedDate
-
-    // Flujo para enviar mensajes para toasts/snacks
-    private val _userMessage = MutableSharedFlow<String>()
-    val userMessage: SharedFlow<String> = _userMessage
-
-    // Se recalcula cuando _uiState o _selectedDate cambian.
-    val remindersForSelectedDate: StateFlow<List<Event>> =
-        combine(uiState, selectedDate) { state, date ->
-            if (state is ReminderUiState.Success) {
-                state.events.filter { event ->
-                    isEventOnDate(event, date)
-                }
-            } else {
-                emptyList()
-            }
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
-
-
-    fun setGoogleAccount(account: GoogleSignInAccount, context: android.content.Context) {
-        _googleAccount.value = account
-        val credential = GoogleAccountCredential.usingOAuth2(context, Collections.singleton(CalendarScopes.CALENDAR))
-        credential.selectedAccount = account.account
-        calendarService = com.google.api.services.calendar.Calendar.Builder(
-            NetHttpTransport(),
-            GsonFactory.getDefaultInstance(),
-            credential
-        ).setApplicationName("PetCare").build()
-
-        // Cargar los recordatorios iniciales al configurar la cuenta
-        loadReminders()
-    }
-
-    fun setSelectedDate(date: LocalDate) {
-        _selectedDate.value = date
-    }
-
-    fun loadReminders() {
-        val service = calendarService ?: return
-        _uiState.value = ReminderUiState.Loading
-
-        viewModelScope.launch {
-            try {
-                val events = withContext(Dispatchers.IO) {
-                    val now = DateTime(System.currentTimeMillis())
-                    service.events().list("primary")
-                        .setTimeMin(now)
-                        .setSingleEvents(true)
-                        .setOrderBy("startTime")
-                        .execute()
-                }
-                _uiState.value = ReminderUiState.Success(events.items ?: emptyList())
-            } catch (e: Exception) {
-                e.printStackTrace()
-                _uiState.value = ReminderUiState.Error("Error al cargar recordatorios: ${e.message}")
-            }
-        }
-    }
-
-    fun addReminder(title: String, description: String, date: LocalDate, time: LocalTime) {
-        val service = calendarService ?: return
-
-        viewModelScope.launch {
-            try {
-                val createdEvent = withContext(Dispatchers.IO) {
-                    val startDateTime = DateTime(Date.from(date.atTime(time).atZone(ZoneId.systemDefault()).toInstant()))
-                    val endDateTime = DateTime(Date.from(date.atTime(time).plusHours(1).atZone(ZoneId.systemDefault()).toInstant()))
-
-                    val event = Event()
-                        .setSummary(title)
-                        .setDescription(description)
-                        .setStart(com.google.api.services.calendar.model.EventDateTime().setDateTime(startDateTime))
-                        .setEnd(com.google.api.services.calendar.model.EventDateTime().setDateTime(endDateTime))
-
-                    service.events().insert("primary", event).execute()
-                }
-                _userMessage.emit("Recordatorio '${createdEvent.summary}' añadido.")
-                // Recargar la lista para reflejar nuevo estado
-                loadReminders()
-            } catch (e: Exception) {
-                e.printStackTrace()
-                _userMessage.emit("Error al añadir recordatorio: ${e.message}")
-            }
-        }
-    }
-
-    private fun isEventOnDate(event: Event, date: LocalDate): Boolean {
-        // El evento tiene fecha y hora (dateTime)
-        val eventDateTime = event.start?.dateTime
-        if (eventDateTime != null) {
-            val eventLocalDate = Instant.ofEpochMilli(eventDateTime.value)
-                .atZone(ZoneId.systemDefault())
-                .toLocalDate()
-            return eventLocalDate == date
-        }
-
-        //El evento es de todo el día (date)
-        val eventDate = event.start?.date
-        if (eventDate != null) {
-            // La API devuelve el formato 'YYYY-MM-DD'
-            return LocalDate.parse(eventDate.toString()) == date
-        }
-
-        return false
-    }
-
-     */
 }
 
 

@@ -1,5 +1,6 @@
 package com.jejhdmdv.proyecto_pdm.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -125,7 +126,7 @@ fun HomeScreen(
                 Spacer(modifier = Modifier.height(20.dp))
 
                 // Sección de recordatorios y avisos
-                RemindersAndNoticesSection()
+                RemindersAndNoticesSection(onNavigateToAppointments = onNavigateToAppointments)
 
                 Spacer(modifier = Modifier.height(100.dp))
             }
@@ -313,7 +314,9 @@ private fun RegisterPetButton(
  //Sección de recordatorios y avisos
 
 @Composable
-private fun RemindersAndNoticesSection() {
+private fun RemindersAndNoticesSection(
+    onNavigateToAppointments: () -> Unit
+) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(16.dp)
@@ -323,7 +326,10 @@ private fun RemindersAndNoticesSection() {
             modifier = Modifier
                 .weight(1f)
                 .height(150.dp)
-                .clickable {  },
+                .clickable {
+                    Log.d("HomeScreenDebug", "Card de Recordatorios fue presionada.")
+                    onNavigateToAppointments()
+                },
             colors = CardDefaults.cardColors(
                 containerColor = Color.White
             ),
