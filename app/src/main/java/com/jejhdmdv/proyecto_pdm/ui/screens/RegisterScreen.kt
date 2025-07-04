@@ -239,6 +239,7 @@ fun RegisterScreen(
                 shape = RoundedCornerShape(8.dp)
             )
 
+            Spacer(modifier = Modifier.height(16.dp))
             // Campo Teléfono
             OutlinedTextField(
                 value = telefono,
