@@ -17,12 +17,12 @@ data class RegisterResponse(
 )
 
 data class VetRegisterRequest(
-    val nombre: String,
     val email: String,
-    val telefono: String,
-    val direccion: String,
     val password: String,
-    val passwordConfirmation: String
+    val passwordConfirmation: String,
+    val nombre: String,
+    val direccion: String,
+    val telefono: String,
 )
 
 data class GoogleSignInRequest(
